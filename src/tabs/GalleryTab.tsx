@@ -13,7 +13,7 @@ type GalleryImage = {
 };
 
 const galleryImages: GalleryImage[] = [
-  { id: 1, src: `/images/1.png`, alt: "Memory 1", spotifyId: "1mXVgsBdtIVeCLJnSnmtdV" },
+  { id: 1, src: `/images/1.png`, alt: "Memory 1", spotifyId: "5y2ijHECwFYWqcAHKTZgzD" },
   { id: 2, src: `/images/2.png`, alt: "Memory 2", spotifyId: "6FIEuf1JIzmCtach0gXpeG" },
   { id: 3, src: `/images/3.png`, alt: "Memory 3", spotifyId: "4u8RkgV6P4TLi89SmlUtv8" },
   { id: 4, src: `/images/4.png`, alt: "Memory 4", spotifyId: "0tgVpDi06FyKpA1z0VMD4v" },
@@ -36,7 +36,7 @@ const galleryImages: GalleryImage[] = [
   { id: 21, src: `/images/21.png`, alt: "Memory 21", spotifyId: "4QxDOjgpYtQDxxbWPuEJOy" },
   { id: 22, src: `/images/22.png`, alt: "Memory 22", spotifyId: "5uCax9HTNlzGybIStD3vDh" },
   { id: 23, src: `/images/23.png`, alt: "Memory 23", spotifyId: "0Cvjlph1WGbwZY1PlMEtJY" },
-  { id: 24, src: `/images/24.png`, alt: "Memory 24", spotifyId: "3ZpWy5rBZv2aLQAldnmTsP" },
+  { id: 24, src: `/images/24.png`, alt: "Memory 24", spotifyId: "3rWBerJZHd5IvS6o3dQEk7" },
 ];
 
 export function GalleryTab() {
