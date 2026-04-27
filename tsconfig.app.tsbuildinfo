@@ -1,1 +1,1 @@
-{"root":["./src/app.tsx","./src/main.tsx","./src/vite-env.d.ts"],"version":"5.9.3"}
+{"root":["./src/app.tsx","./src/main.tsx","./src/types.ts","./src/vite-env.d.ts","./src/components/floatinghearts.tsx","./src/components/navigation.tsx","./src/components/revealsection.tsx","./src/tabs/bouquettab.tsx","./src/tabs/gallerytab.tsx","./src/tabs/lettertab.tsx"],"version":"5.9.3"}
