@@ -231,6 +231,102 @@ for (let i = 0; i < 55; i++) {
   });
 }
 
+// ─────────────────────────────────────────────────────────────
+// FILLER FLOWER ARRAYS
+// ─────────────────────────────────────────────────────────────
+
+interface FillerFlower {
+  dx: number; dy: number; size: number;
+  hue: number; sat: number; light: number;
+  delay: number; rot: number;
+}
+
+/** Wax flowers — small star-shaped 5-petal blooms (pink / white / mauve) */
+const WAX_FLOWERS: FillerFlower[] = (() => {
+  const out: FillerFlower[] = [];
+  // Hug the outer ring of roses and fill inter-rose gaps
+  const seeds: [number, number, number][] = [
+    // [dx, dy, sizeMult]
+    [-105, -105, 0.9], [ -68, -118, 1.0], [  12, -128, 0.95],
+    [  72, -114, 1.0], [ 112, -98,  0.9], [ 130,  -58, 0.85],
+    [ 118,  -18, 0.9], [  98,   15, 0.85],[ -98,   10, 0.85],
+    [-120,  -32, 0.9], [-130,  -72, 0.85],[ -82,  -52, 0.78],
+    [  88,  -60, 0.8], [  42,  -50, 0.75],[ -45,  -48, 0.75],
+    [  -5,  -40, 0.72],[  58,  -90, 0.82],[ -60,  -88, 0.82],
+    [  24,  -88, 0.78],[ -28,  -95, 0.78],[ 100, -140, 0.88],
+    [ -95, -140, 0.88],[  38, -145, 0.9], [ -40, -145, 0.9],
+  ];
+  const palettes = [
+    { hue: 300, sat: 35, light: 78 }, // mauve
+    { hue:  10, sat: 20, light: 92 }, // near-white blush
+    { hue: 280, sat: 38, light: 74 }, // soft lavender
+    { hue: 340, sat: 42, light: 80 }, // pale pink
+    { hue:  45, sat: 18, light: 90 }, // cream
+  ];
+  seeds.forEach(([dx, dy, sm], i) => {
+    const pal = palettes[i % palettes.length];
+    out.push({
+      dx, dy,
+      size: (9 + (i % 3) * 2.5) * sm,
+      hue: pal.hue, sat: pal.sat, light: pal.light,
+      delay: 1900 + i * 55,
+      rot: (i * 1.618) % (Math.PI * 2),
+    });
+  });
+  return out;
+})();
+
+/** Mini daisies — white petals + yellow dome, like feverfew / chamomile */
+const MINI_DAISIES: FillerFlower[] = (() => {
+  const out: FillerFlower[] = [];
+  const seeds: [number, number][] = [
+    [-92, -80], [90, -78], [-50, -130], [52, -132],
+    [0,  -160], [125, -115], [-122, -110], [75,  30],
+    [-76, 25], [140, -40], [-138, -45],  [30, -170],
+    [-30,-168], [108, -168], [-106,-165],
+  ];
+  seeds.forEach(([dx, dy], i) => {
+    out.push({
+      dx, dy,
+      size: 7 + (i % 3) * 2,
+      hue: 50, sat: 90, light: 58,   // center color (yellow)
+      delay: 2050 + i * 45,
+      rot: (i * 0.9) % (Math.PI * 2),
+    });
+  });
+  return out;
+})();
+
+/** Statice / limonium — tiny papery clustered blooms in purple & lilac */
+const STATICE_CLUSTERS: FillerFlower[] = (() => {
+  const out: FillerFlower[] = [];
+  const seeds: [number, number, number, number, number][] = [
+    // [dx, dy, size, hue, light]
+    [-115, -130, 10, 265, 68],
+    [  85, -148, 9,  272, 70],
+    [-140,  -90, 10, 258, 64],
+    [ 140,  -95, 9,  280, 72],
+    [ -30, -175, 8,  268, 70],
+    [  32, -178, 8,  262, 66],
+    [ -68,  -62, 7,  275, 74],
+    [  70,  -58, 7,  270, 72],
+    [ 115,   10, 8,  260, 66],
+    [-112,    5, 8,  278, 72],
+    [   4, -108, 7,  266, 70],
+    [  55,  -18, 6,  272, 68],
+    [ -58,  -18, 6,  268, 68],
+  ];
+  seeds.forEach(([dx, dy, size, hue, light], i) => {
+    out.push({
+      dx, dy, size,
+      hue, sat: 48, light,
+      delay: 2100 + i * 40,
+      rot: (i * 1.23) % (Math.PI * 2),
+    });
+  });
+  return out;
+})();
+
 // Falling petals
 interface Petal { x: number; y: number; vx: number; vy: number; r: number; rot: number; vr: number; hue: number; opacity: number }
 
@@ -316,51 +412,38 @@ function drawRealisticRose(
   // === Outer petals (7) — fully open, curl back at edges ===
   const ob = easeOutCubic(clamp01(bloom * 2.2));
   if (ob > 0) {
-    // Shadow beneath this layer
-    ctx.shadowBlur = size * 0.55;
-    ctx.shadowColor = hsla(hue, sat + 5, light - 28, 0.32);
     for (let i = 0; i < 7; i++) {
       const angle = (i / 7) * Math.PI * 2 + 0.18;
       const j = ((i * 2741) % 100) * 0.001 * 0.18 - 0.09; // jitter
       drawPetalPath(ctx, size * 0.92, size * 0.58, angle + j, hue - 2, sat - 3, light + 12, ob, 0.25, true);
     }
-    ctx.shadowBlur = 0;
   }
 
   // === Middle petals (6) — half-open ===
   const mb = easeOutCubic(clamp01((bloom - 0.10) * 2.6));
   if (mb > 0) {
-    ctx.shadowBlur = size * 0.4;
-    ctx.shadowColor = hsla(hue, sat + 8, light - 24, 0.28);
     for (let i = 0; i < 6; i++) {
       const angle = (i / 6) * Math.PI * 2 + 0.52;
       drawPetalPath(ctx, size * 0.65, size * 0.42, angle, hue, sat + 3, light + 4, mb, 0.08, true);
     }
-    ctx.shadowBlur = 0;
   }
 
   // === Inner petals (5) — slightly open ===
   const ib = easeOutCubic(clamp01((bloom - 0.28) * 2.8));
   if (ib > 0) {
-    ctx.shadowBlur = size * 0.3;
-    ctx.shadowColor = hsla(hue, sat + 12, light - 26, 0.3);
     for (let i = 0; i < 5; i++) {
       const angle = (i / 5) * Math.PI * 2 + 0.25;
       drawPetalPath(ctx, size * 0.44, size * 0.3, angle, hue, sat + 7, light - 3, ib, -0.05, false);
     }
-    ctx.shadowBlur = 0;
   }
 
   // === Innermost cupped petals (4) — tightly curled ===
   const sp = easeOutCubic(clamp01((bloom - 0.48) * 3.2));
   if (sp > 0) {
-    ctx.shadowBlur = size * 0.2;
-    ctx.shadowColor = hsla(hue, sat + 15, light - 30, 0.35);
     for (let i = 0; i < 4; i++) {
       const angle = (i / 4) * Math.PI * 2 + 0.7;
       drawPetalPath(ctx, size * 0.26, size * 0.18, angle, hue, sat + 12, light - 11, sp, -0.18, false);
     }
-    ctx.shadowBlur = 0;
   }
 
   // === Tight spiral center bud (3 tiny petals) ===
@@ -406,9 +489,7 @@ function drawLeaf(
   ctx.translate(x, y);
   ctx.rotate(angle);
 
-  // Leaf shadow
-  ctx.shadowBlur = 6;
-  ctx.shadowColor = hsla(hue - 10, 60, 22, 0.25);
+  // Leaf depth (shadow removed for performance)
 
   // Leaf body
   ctx.beginPath();
@@ -425,7 +506,6 @@ function drawLeaf(
   ctx.fillStyle = g;
   ctx.fill();
 
-  ctx.shadowBlur = 0;
 
   // Midrib
   ctx.beginPath();
@@ -464,9 +544,7 @@ function drawStem(
   const cpx = x1 + (x2 - x1) * 0.45 + (x2 - x1) * 0.08;
   const cpy = y1 + (y2 - y1) * 0.5 - 4;
 
-  // Stem shadow
-  ctx.shadowBlur = 3;
-  ctx.shadowColor = "rgba(0,0,0,0.2)";
+  // Stem (shadow removed for performance)
 
   // Stem gradient (dark green at base, lighter green toward flower)
   const sg = ctx.createLinearGradient(x1, y1, ex, ey);
@@ -481,7 +559,6 @@ function drawStem(
   ctx.moveTo(x1, y1);
   ctx.quadraticCurveTo(cpx, cpy, ex, ey);
   ctx.stroke();
-  ctx.shadowBlur = 0;
   ctx.restore();
 }
 
@@ -496,10 +573,23 @@ function drawWrapping(
   ctx.translate(cx, topY);
   ctx.scale(sc, sc);
 
-  const topHalf = wrapW * 0.56;
-  const botHalf = wrapW * 0.04;
-  const ribbonY = wrapH * 0.21;
-  const ribbonHalfW = topHalf - (topHalf - botHalf) * (ribbonY / wrapH) + 5;
+  const topHalf = wrapW * 0.58;
+  const botHalf = wrapW * 0.38;
+  const ribbonY = wrapH * 0.22;
+
+  // The wrapper shape: wide at top, gently tapering with subtle curves
+  const drawWrapPath = () => {
+    ctx.beginPath();
+    ctx.moveTo(-topHalf, 0);
+    ctx.lineTo(topHalf, 0);
+    // Right side — mostly straight with very subtle inward curve
+    ctx.lineTo(botHalf, wrapH);
+    // Bottom — pointed/narrow base
+    ctx.lineTo(-botHalf, wrapH);
+    // Left side — mirror
+    ctx.lineTo(-topHalf, 0);
+    ctx.closePath();
+  };
 
   // ── Tissue paper peeking at top ──
   const tissueColors = [
@@ -529,14 +619,8 @@ function drawWrapping(
     ctx.restore();
   }
 
-  // ── Main cone wrapping paper ──
-  ctx.beginPath();
-  ctx.moveTo(-topHalf, 0);
-  ctx.lineTo(topHalf, 0);
-  ctx.quadraticCurveTo(topHalf * 0.38, wrapH * 0.62, botHalf, wrapH);
-  ctx.lineTo(-botHalf, wrapH);
-  ctx.quadraticCurveTo(-topHalf * 0.38, wrapH * 0.62, -topHalf, 0);
-  ctx.closePath();
+  // ── Main wrapping paper ──
+  drawWrapPath();
 
   // Rich gradient — warm ivory/pink paper
   const wg = ctx.createLinearGradient(-topHalf, 0, topHalf, 0);
@@ -566,51 +650,78 @@ function drawWrapping(
 
   // ── Clip and draw texture inside ──
   ctx.save();
-  ctx.beginPath();
-  ctx.moveTo(-topHalf, 0);
-  ctx.lineTo(topHalf, 0);
-  ctx.quadraticCurveTo(topHalf * 0.38, wrapH * 0.62, botHalf, wrapH);
-  ctx.lineTo(-botHalf, wrapH);
-  ctx.quadraticCurveTo(-topHalf * 0.38, wrapH * 0.62, -topHalf, 0);
-  ctx.closePath();
+  drawWrapPath();
   ctx.clip();
 
-  // Subtle dot pattern
-  ctx.fillStyle = "rgba(180,130,145,0.1)";
-  for (let row = 0; row < 13; row++) {
-    const frac = row / 13;
+  // Grid / checkered pattern like reference image
+  ctx.strokeStyle = "rgba(180,130,145,0.10)";
+  ctx.lineWidth = 0.7;
+  const gridSpacing = 12;
+  for (let gy = 0; gy < wrapH; gy += gridSpacing) {
+    const frac = gy / wrapH;
+    const halfAtY = topHalf - (topHalf - botHalf) * frac;
+    // Horizontal lines
+    ctx.beginPath();
+    ctx.moveTo(-halfAtY, gy);
+    ctx.lineTo(halfAtY, gy);
+    ctx.stroke();
+  }
+  // Vertical lines that follow the taper
+  for (let col = -20; col <= 20; col++) {
+    const t = col / 20;
+    ctx.beginPath();
+    ctx.moveTo(t * topHalf, 0);
+    ctx.lineTo(t * botHalf, wrapH);
+    ctx.stroke();
+  }
+
+  // Subtle dot pattern at intersections
+  ctx.fillStyle = "rgba(180,130,145,0.08)";
+  for (let row = 0; row < Math.floor(wrapH / gridSpacing); row++) {
+    const frac = row / Math.floor(wrapH / gridSpacing);
     const curHalf = topHalf - (topHalf - botHalf) * frac;
-    const dotY = 10 + row * (wrapH / 13);
-    const cols = Math.floor(curHalf * 2 / 14);
+    const dotY = row * gridSpacing;
+    const cols = Math.floor(curHalf * 2 / gridSpacing);
     for (let col = 0; col < cols; col++) {
-      const dotX = -curHalf + 7 + col * 14 + (row % 2 === 0 ? 0 : 7);
+      const dotX = -curHalf + gridSpacing / 2 + col * gridSpacing;
       ctx.beginPath();
-      ctx.arc(dotX, dotY, 1.6, 0, Math.PI * 2);
+      ctx.arc(dotX, dotY, 1.2, 0, Math.PI * 2);
       ctx.fill();
     }
   }
 
-  // Radiating crease lines for realism
-  ctx.strokeStyle = "rgba(160,95,115,0.06)";
+  // Radiating crease lines from center-bottom for realism
+  ctx.strokeStyle = "rgba(160,95,115,0.05)";
   ctx.lineWidth = 1;
   for (let i = 0; i < 9; i++) {
-    const angle = -0.7 + (i / 8) * 1.4;
+    const angle = -0.55 + (i / 8) * 1.1;
     ctx.beginPath();
-    ctx.moveTo(0, wrapH);
-    ctx.lineTo(Math.sin(angle) * wrapH * 1.3, -wrapH * 0.08);
+    ctx.moveTo(0, wrapH * 0.92);
+    ctx.lineTo(Math.sin(angle) * wrapH * 1.1, -wrapH * 0.05);
     ctx.stroke();
   }
   ctx.restore();
 
+  // ── Center fold V-line shadow ──
+  ctx.save();
+  ctx.globalAlpha = 0.07;
+  ctx.beginPath();
+  ctx.moveTo(-3, wrapH * 0.25);
+  ctx.lineTo(0, wrapH);
+  ctx.lineTo(3, wrapH * 0.25);
+  ctx.closePath();
+  ctx.fillStyle = "rgba(0,0,0,1)";
+  ctx.fill();
+  ctx.restore();
+
   // ── Left flap fold shadow ──
   ctx.save();
-  ctx.globalAlpha = 0.12;
+  ctx.globalAlpha = 0.10;
   ctx.beginPath();
   ctx.moveTo(-topHalf, 0);
-  ctx.lineTo(-topHalf + 22, 0);
-  ctx.quadraticCurveTo(-topHalf * 0.32 + 16, wrapH * 0.62, botHalf + 5, wrapH);
+  ctx.lineTo(-topHalf + 20, 0);
+  ctx.lineTo(-botHalf + 4, wrapH);
   ctx.lineTo(-botHalf, wrapH);
-  ctx.quadraticCurveTo(-topHalf * 0.38, wrapH * 0.62, -topHalf, 0);
   ctx.closePath();
   ctx.fillStyle = "rgba(0,0,0,1)";
   ctx.fill();
@@ -618,19 +729,19 @@ function drawWrapping(
 
   // ── Right flap fold highlight ──
   ctx.save();
-  ctx.globalAlpha = 0.08;
+  ctx.globalAlpha = 0.06;
   ctx.beginPath();
   ctx.moveTo(topHalf, 0);
-  ctx.lineTo(topHalf - 22, 0);
-  ctx.quadraticCurveTo(topHalf * 0.32 - 16, wrapH * 0.62, -botHalf - 5, wrapH);
+  ctx.lineTo(topHalf - 20, 0);
+  ctx.lineTo(botHalf - 4, wrapH);
   ctx.lineTo(botHalf, wrapH);
-  ctx.quadraticCurveTo(topHalf * 0.38, wrapH * 0.62, topHalf, 0);
   ctx.closePath();
   ctx.fillStyle = "rgba(255,255,255,1)";
   ctx.fill();
   ctx.restore();
 
   // ── Ribbon ──
+  const ribbonHalfW = topHalf - (topHalf - botHalf) * (ribbonY / wrapH) + 5;
   const rP = clamp01((p - 0.3) * 2.2);
   if (rP > 0) {
     ctx.globalAlpha = rP;
@@ -805,6 +916,212 @@ function drawCard(ctx: CanvasRenderingContext2D, cx: number, cardY: number, p: n
   ctx.restore();
 }
 
+// ─────────────────────────────────────────────────────────────
+// FILLER FLOWER DRAW FUNCTIONS
+// ─────────────────────────────────────────────────────────────
+
+/**
+ * Wax flower — 5 rounded petals, golden stamens center.
+ * Mimics Chamelaucium or small spray stock flowers.
+ */
+function drawWaxFlower(
+  ctx: CanvasRenderingContext2D,
+  x: number, y: number,
+  size: number,
+  hue: number, sat: number, light: number,
+  bloom: number, rot: number
+) {
+  if (bloom <= 0) return;
+  const s = easeOutCubic(bloom);
+  ctx.save();
+  ctx.translate(x, y);
+  ctx.rotate(rot);
+  ctx.globalAlpha = s;
+
+  // Wax flower (shadow removed for performance)
+
+  // 5 petals
+  for (let i = 0; i < 5; i++) {
+    const a = (i / 5) * Math.PI * 2 - Math.PI / 2;
+    ctx.save();
+    ctx.rotate(a);
+
+    // Petal shape: oval shifted outward from center
+    ctx.beginPath();
+    ctx.ellipse(0, -size * 0.52, size * 0.30 * s, size * 0.38 * s, 0, 0, Math.PI * 2);
+
+    const pg = ctx.createRadialGradient(0, -size * 0.48, 0, 0, -size * 0.52, size * 0.4);
+    pg.addColorStop(0,   hsla(hue, sat - 6,  light + 16, 1));
+    pg.addColorStop(0.5, hsla(hue, sat,       light + 6,  1));
+    pg.addColorStop(1,   hsla(hue, sat + 8,  light - 10, 1));
+    ctx.fillStyle = pg;
+    ctx.fill();
+
+    // Petal vein highlight
+    ctx.save();
+    ctx.globalAlpha = 0.15;
+    ctx.beginPath();
+    ctx.ellipse(-size * 0.06, -size * 0.52, size * 0.06, size * 0.24, -0.2, 0, Math.PI * 2);
+    ctx.fillStyle = "#fff";
+    ctx.fill();
+    ctx.restore();
+
+    ctx.restore();
+  }
+
+
+  // Stamens ring
+  for (let i = 0; i < 8; i++) {
+    const a = (i / 8) * Math.PI * 2;
+    const sr = size * 0.22 * s;
+    ctx.beginPath();
+    ctx.arc(Math.cos(a) * sr * 0.6, Math.sin(a) * sr * 0.6, size * 0.045 * s, 0, Math.PI * 2);
+    ctx.fillStyle = "#d4a820";
+    ctx.fill();
+  }
+
+  // Center disk
+  const cg = ctx.createRadialGradient(-size * 0.06 * s, -size * 0.06 * s, 0, 0, 0, size * 0.22 * s);
+  cg.addColorStop(0, "#fffacc");
+  cg.addColorStop(0.55, "#e8c840");
+  cg.addColorStop(1, "#b8920c");
+  ctx.beginPath();
+  ctx.arc(0, 0, size * 0.2 * s, 0, Math.PI * 2);
+  ctx.fillStyle = cg;
+  ctx.fill();
+
+  ctx.globalAlpha = 1;
+  ctx.restore();
+}
+
+/**
+ * Mini daisy — 10 narrow white petals + raised yellow dome.
+ * Mimics feverfew, chamomile, or button mums.
+ */
+function drawMiniDaisy(
+  ctx: CanvasRenderingContext2D,
+  x: number, y: number,
+  size: number,
+  bloom: number, rot: number
+) {
+  if (bloom <= 0) return;
+  const s = easeOutCubic(bloom);
+  ctx.save();
+  ctx.translate(x, y);
+  ctx.rotate(rot);
+  ctx.globalAlpha = s;
+
+  // Daisy (shadow removed for performance)
+
+  const pCount = 10;
+  for (let i = 0; i < pCount; i++) {
+    const a = (i / pCount) * Math.PI * 2;
+    ctx.save();
+    ctx.rotate(a);
+
+    ctx.beginPath();
+    ctx.moveTo(-size * 0.13, -size * 0.2);
+    ctx.bezierCurveTo(-size * 0.16, -size * 0.52, -size * 0.11, -size * 0.85, 0, -size * 0.96);
+    ctx.bezierCurveTo(size * 0.11, -size * 0.85, size * 0.16, -size * 0.52, size * 0.13, -size * 0.2);
+    ctx.closePath();
+
+    const pg = ctx.createLinearGradient(0, -size * 0.2, 0, -size * 0.96);
+    pg.addColorStop(0, "rgba(240,240,230,0.85)");
+    pg.addColorStop(0.4, "rgba(255,255,250,0.92)");
+    pg.addColorStop(1, "rgba(255,255,255,0.88)");
+    ctx.fillStyle = pg;
+    ctx.fill();
+    ctx.restore();
+  }
+
+  // shadows removed for performance
+
+  // Yellow dome center with texture dots
+  const domR = size * 0.32 * s;
+  const dg = ctx.createRadialGradient(-domR * 0.25, -domR * 0.3, 0, 0, 0, domR);
+  dg.addColorStop(0, "#fff8a0");
+  dg.addColorStop(0.35, "#f5d020");
+  dg.addColorStop(0.72, "#d49010");
+  dg.addColorStop(1, "#a86000");
+  ctx.beginPath();
+  ctx.arc(0, 0, domR, 0, Math.PI * 2);
+  ctx.fillStyle = dg;
+  ctx.fill();
+
+  // Tiny bumps on dome
+  ctx.fillStyle = "rgba(80,40,0,0.18)";
+  for (let i = 0; i < 6; i++) {
+    const ba = (i / 6) * Math.PI * 2 + 0.3;
+    ctx.beginPath();
+    ctx.arc(Math.cos(ba) * domR * 0.55, Math.sin(ba) * domR * 0.55, domR * 0.11, 0, Math.PI * 2);
+    ctx.fill();
+  }
+
+  ctx.globalAlpha = 1;
+  ctx.restore();
+}
+
+/**
+ * Statice / limonium cluster — tiny 4-petal papery florets
+ * packed into a small cloud. Purple, lavender, or creamy white.
+ */
+function drawStaticeCluster(
+  ctx: CanvasRenderingContext2D,
+  x: number, y: number,
+  size: number,
+  hue: number, sat: number, light: number,
+  bloom: number, rot: number
+) {
+  if (bloom <= 0) return;
+  const s = easeOutCubic(bloom);
+  ctx.save();
+  ctx.translate(x, y);
+  ctx.rotate(rot);
+  ctx.globalAlpha = s;
+
+  // Draw 9 tiny florets in a cloud arrangement
+  const offsets: [number, number, number][] = [
+    [0, 0, 1.0],
+    [-size * 0.55,  size * 0.22, 0.85],
+    [ size * 0.55,  size * 0.18, 0.82],
+    [-size * 0.25, -size * 0.52, 0.88],
+    [ size * 0.28, -size * 0.50, 0.85],
+    [-size * 0.70, -size * 0.15, 0.75],
+    [ size * 0.68, -size * 0.18, 0.75],
+    [-size * 0.38,  size * 0.62, 0.72],
+    [ size * 0.40,  size * 0.60, 0.72],
+  ];
+
+  for (const [ox, oy, sc] of offsets) {
+    const fr = size * 0.36 * sc;
+    ctx.save();
+    ctx.translate(ox, oy);
+
+    // 4-petal floret (tiny cross-like)
+    for (let i = 0; i < 4; i++) {
+      const a = (i / 4) * Math.PI * 2 + 0.4;
+      ctx.beginPath();
+      ctx.ellipse(Math.cos(a) * fr * 0.55, Math.sin(a) * fr * 0.55, fr * 0.42, fr * 0.30, a, 0, Math.PI * 2);
+      const pg = ctx.createRadialGradient(Math.cos(a)*fr*0.4, Math.sin(a)*fr*0.4, 0, Math.cos(a)*fr*0.55, Math.sin(a)*fr*0.55, fr*0.5);
+      pg.addColorStop(0, hsla(hue, sat - 8, light + 14, 0.95));
+      pg.addColorStop(1, hsla(hue, sat + 6, light - 8,  0.9));
+      ctx.fillStyle = pg;
+      ctx.fill();
+    }
+
+    // Tiny yellow-white center
+    ctx.beginPath();
+    ctx.arc(0, 0, fr * 0.22, 0, Math.PI * 2);
+    ctx.fillStyle = hsla(50, 60, 88, 0.95);
+    ctx.fill();
+
+    ctx.restore();
+  }
+
+  ctx.globalAlpha = 1;
+  ctx.restore();
+}
+
 interface Sparkle { x: number; y: number; r: number; speed: number; phase: number }
 
 /* ── BouquetPage ── */
@@ -858,16 +1175,16 @@ function BouquetPage() {
     let msgShown = false;
 
     const animate = (now: number) => {
-      const el = now - startRef.current;
+      const el = (now - startRef.current); 
       const w = canvas.width / dpr;
       const h = canvas.height / dpr;
       ctx.clearRect(0, 0, w, h);
 
       const cx = w / 2;
-      const bouquetCy = h * 0.30;
+      const bouquetCy = h * 0.44; // Lowered to prevent cropping flowers at the top
       const wrapTopY  = bouquetCy + 18;
-      const wrapH     = h * 0.54;
-      const wrapW     = w * 0.50;
+      const wrapH     = h * 0.46; // Adjusted so the bottom reaches closer to the text/rose
+      const wrapW     = w * 0.45;
 
       // Background radial glow
       const bgP = prog(el, 0, 900);
@@ -901,15 +1218,7 @@ function BouquetPage() {
         }
       }
 
-      // Wrapping paper (draw before flowers so it appears behind)
-      drawWrapping(ctx, cx, wrapTopY, wrapW, wrapH, prog(el, 250, 680));
-
-      // Leaves
-      for (const lf of LEAVES) {
-        drawLeaf(ctx, cx + lf.dx, bouquetCy + lf.dy, lf.angle, lf.len, lf.width, lf.hue, prog(el, lf.delay, 420));
-      }
-
-      // Stems
+      // Stems for Roses (drawn behind wrapping paper)
       for (const rose of ROSES) {
         const stemStart = rose.delay - 450;
         const convergePt = { x: cx + rose.dx * 0.04, y: wrapTopY + wrapH * 0.24 };
@@ -920,6 +1229,31 @@ function BouquetPage() {
           prog(el, stemStart, 380),
           1.8
         );
+      }
+
+      // Stems for Filler Flowers (drawn behind wrapping paper)
+      const drawFillerStem = (f: FillerFlower) => {
+        const stemStart = f.delay - 450;
+        const convergePt = { x: cx + f.dx * 0.05, y: wrapTopY + wrapH * 0.22 };
+        drawStem(
+          ctx,
+          convergePt.x, convergePt.y,
+          cx + f.dx, bouquetCy + f.dy + 6, // Stop slightly below center to avoid overlapping flower
+          prog(el, stemStart, 380),
+          1.2 // Thinner stems
+        );
+      };
+
+      for (const wf of WAX_FLOWERS) drawFillerStem(wf);
+      for (const md of MINI_DAISIES) drawFillerStem(md);
+      for (const sc of STATICE_CLUSTERS) drawFillerStem(sc);
+
+      // Wrapping paper (draw after stems so they appear tucked inside)
+      drawWrapping(ctx, cx, wrapTopY, wrapW, wrapH, prog(el, 250, 680));
+
+      // Leaves
+      for (const lf of LEAVES) {
+        drawLeaf(ctx, cx + lf.dx, bouquetCy + lf.dy, lf.angle, lf.len, lf.width, lf.hue, prog(el, lf.delay, 420));
       }
 
       // Baby's breath
@@ -937,6 +1271,33 @@ function BouquetPage() {
         ctx.arc(cx + bb.dx, bouquetCy + bb.dy, bb.r * s * 2.4, 0, Math.PI * 2);
         ctx.fill();
         ctx.globalAlpha = 1;
+      }
+
+      // ── Wax flowers ──
+      for (const wf of WAX_FLOWERS) {
+        drawWaxFlower(
+          ctx, cx + wf.dx, bouquetCy + wf.dy,
+          wf.size, wf.hue, wf.sat, wf.light,
+          prog(el, wf.delay, 550), wf.rot
+        );
+      }
+
+      // ── Mini daisies ──
+      for (const md of MINI_DAISIES) {
+        drawMiniDaisy(
+          ctx, cx + md.dx, bouquetCy + md.dy,
+          md.size,
+          prog(el, md.delay, 500), md.rot
+        );
+      }
+
+      // ── Statice clusters ──
+      for (const sc of STATICE_CLUSTERS) {
+        drawStaticeCluster(
+          ctx, cx + sc.dx, bouquetCy + sc.dy,
+          sc.size, sc.hue, sc.sat, sc.light,
+          prog(el, sc.delay, 480), sc.rot
+        );
       }
 
       // Roses — draw back-to-front (by dy ascending)
