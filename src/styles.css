@@ -415,6 +415,15 @@ h1 {
   height: min(600px, 72vh);
   border-radius: 28px;
   display: block;
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity 2.4s cubic-bezier(0.16, 1, 0.3, 1),
+              transform 2.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.bouquet-canvas.visible {
+  opacity: 1;
+  transform: translateY(0);
 }
 
 /* Bouquet message */
