@@ -104,33 +104,30 @@ interface FillerFlower {
   delay: number; rot: number;
 }
 
-/** Wax flowers — small star-shaped 5-petal blooms (pink / white / mauve) */
+/** Wax flowers — small 5-petal blooms placed at edges, not overlapping roses */
 const WAX_FLOWERS: FillerFlower[] = (() => {
   const out: FillerFlower[] = [];
-  // Hug the outer ring of roses and fill inter-rose gaps
+  // Positioned at outer periphery only — framing the rose cluster
   const seeds: [number, number, number][] = [
-    // [dx, dy, sizeMult]
-    [-105, -105, 0.9], [ -68, -118, 1.0], [  12, -128, 0.95],
-    [  72, -114, 1.0], [ 112, -98,  0.9], [ 130,  -58, 0.85],
-    [ 118,  -18, 0.9], [  98,   15, 0.85],[ -98,   10, 0.85],
-    [-120,  -32, 0.9], [-130,  -72, 0.85],[ -82,  -52, 0.78],
-    [  88,  -60, 0.8], [  42,  -50, 0.75],[ -45,  -48, 0.75],
-    [  -5,  -40, 0.72],[  58,  -90, 0.82],[ -60,  -88, 0.82],
-    [  24,  -88, 0.78],[ -28,  -95, 0.78],[ 100, -140, 0.88],
-    [ -95, -140, 0.88],[  38, -145, 0.9], [ -40, -145, 0.9],
+    // [dx, dy, sizeMult] — edge positions only
+    [-110, -130, 0.7], [  12, -145, 0.75], [ 115, -125, 0.7],
+    [ 135,  -55, 0.65], [ 125,   15, 0.6], [-125,   10, 0.6],
+    [-135,  -60, 0.65], [-100, -155, 0.72], [ 100, -155, 0.72],
+    [  55, -158, 0.68], [ -55, -158, 0.68], [ 145,  -20, 0.55],
+    [-142,  -25, 0.55], [   0, -170, 0.7],
   ];
   const palettes = [
-    { hue: 300, sat: 35, light: 78 }, // mauve
-    { hue:  10, sat: 20, light: 92 }, // near-white blush
-    { hue: 280, sat: 38, light: 74 }, // soft lavender
-    { hue: 340, sat: 42, light: 80 }, // pale pink
-    { hue:  45, sat: 18, light: 90 }, // cream
+    { hue: 300, sat: 30, light: 80 }, // soft mauve
+    { hue:  10, sat: 18, light: 93 }, // near-white blush
+    { hue: 280, sat: 32, light: 76 }, // soft lavender
+    { hue: 340, sat: 35, light: 82 }, // pale pink
+    { hue:  45, sat: 15, light: 91 }, // cream
   ];
   seeds.forEach(([dx, dy, sm], i) => {
     const pal = palettes[i % palettes.length];
     out.push({
-      dx: dx * 1.15, dy: dy * 1.15,
-      size: (9 + (i % 3) * 2.5) * sm,
+      dx: dx * 1.1, dy: dy * 1.1,
+      size: (7 + (i % 3) * 1.5) * sm,
       hue: pal.hue, sat: pal.sat, light: pal.light,
       delay: 1900 + i * 55,
       rot: (i * 1.618) % (Math.PI * 2),
@@ -139,20 +136,20 @@ const WAX_FLOWERS: FillerFlower[] = (() => {
   return out;
 })();
 
-/** Mini daisies — white petals + yellow dome, like feverfew / chamomile */
+/** Mini daisies — white petals + yellow dome, positioned at edges */
 const MINI_DAISIES: FillerFlower[] = (() => {
   const out: FillerFlower[] = [];
   const seeds: [number, number][] = [
-    [-92, -80], [90, -78], [-50, -130], [52, -132],
-    [0,  -160], [125, -115], [-122, -110], [75,  30],
-    [-76, 25], [140, -40], [-138, -45],  [30, -170],
-    [-30,-168], [108, -168], [-106,-165],
+    [-50, -148], [52, -150], [0,  -175],
+    [125, -130], [-122, -128], [75,  25],
+    [-76, 22], [140, -50], [-138, -55],
+    [108, -165], [-106,-162],
   ];
   seeds.forEach(([dx, dy], i) => {
     out.push({
-      dx: dx * 1.15, dy: dy * 1.15,
-      size: 7 + (i % 3) * 2,
-      hue: 50, sat: 90, light: 58,   // center color (yellow)
+      dx: dx * 1.1, dy: dy * 1.1,
+      size: 6 + (i % 3) * 1.5,
+      hue: 50, sat: 90, light: 58,
       delay: 2050 + i * 45,
       rot: (i * 0.9) % (Math.PI * 2),
     });
@@ -160,29 +157,26 @@ const MINI_DAISIES: FillerFlower[] = (() => {
   return out;
 })();
 
-/** Statice / limonium — tiny papery clustered blooms in purple & lilac */
+/** Statice / limonium — tiny papery clusters at periphery */
 const STATICE_CLUSTERS: FillerFlower[] = (() => {
   const out: FillerFlower[] = [];
   const seeds: [number, number, number, number, number][] = [
-    // [dx, dy, size, hue, light]
-    [-115, -130, 10, 265, 68],
-    [  85, -148, 9,  272, 70],
-    [-140,  -90, 10, 258, 64],
-    [ 140,  -95, 9,  280, 72],
-    [ -30, -175, 8,  268, 70],
-    [  32, -178, 8,  262, 66],
-    [ -68,  -62, 7,  275, 74],
-    [  70,  -58, 7,  270, 72],
-    [ 115,   10, 8,  260, 66],
-    [-112,    5, 8,  278, 72],
-    [   4, -108, 7,  266, 70],
-    [  55,  -18, 6,  272, 68],
-    [ -58,  -18, 6,  268, 68],
+    // [dx, dy, size, hue, light] — positioned at top and edges
+    [-120, -142, 8, 265, 70],
+    [  90, -158, 7,  272, 72],
+    [-145,  -85, 8, 258, 66],
+    [ 145,  -90, 7,  280, 74],
+    [ -30, -185, 6,  268, 72],
+    [  32, -188, 6,  262, 68],
+    [ 120,   12, 6,  260, 68],
+    [-118,    8, 6,  278, 74],
+    [  65, -175, 6,  266, 72],
+    [ -62, -178, 6,  272, 70],
   ];
   seeds.forEach(([dx, dy, size, hue, light], i) => {
     out.push({
-      dx: dx * 1.15, dy: dy * 1.15, size,
-      hue, sat: 48, light,
+      dx: dx * 1.1, dy: dy * 1.1, size: size * 0.85,
+      hue, sat: 45, light,
       delay: 2100 + i * 40,
       rot: (i * 1.23) % (Math.PI * 2),
     });
@@ -193,61 +187,9 @@ const STATICE_CLUSTERS: FillerFlower[] = (() => {
 // Falling petals
 interface Petal { x: number; y: number; vx: number; vy: number; r: number; rot: number; vr: number; hue: number; opacity: number }
 
-// ── Draw one realistic rose petal ──
-function drawPetalPath(
-  ctx: CanvasRenderingContext2D,
-  length: number, width: number,
-  angle: number,
-  hue: number, sat: number, baseLight: number,
-  alpha: number,
-  curlBack: number = 0,
-  highlight: boolean = false
-) {
-  ctx.save();
-  ctx.rotate(angle);
-
-  const l = length;
-  const w = width;
-
-  // Petal outline — broad teardrop with slightly wavy top
-  ctx.beginPath();
-  ctx.moveTo(0, 0);
-  ctx.bezierCurveTo(-w * 0.52, -l * 0.16, -w * 0.9, -l * 0.52, -w * 0.48 + curlBack * w * 0.2, -l * (0.92 + curlBack * 0.12));
-  // Wavy top edge
-  ctx.bezierCurveTo(-w * 0.22 + curlBack * w * 0.08, -l * (1.08 + curlBack * 0.06),
-                     w * 0.22 - curlBack * w * 0.08, -l * (1.08 + curlBack * 0.06),
-                     w * 0.48 - curlBack * w * 0.2, -l * (0.92 + curlBack * 0.12));
-  ctx.bezierCurveTo(w * 0.9, -l * 0.52, w * 0.52, -l * 0.16, 0, 0);
-  ctx.closePath();
-
-  // Rich gradient: dark at base, lighter in middle, near-white at tip
-  const g = ctx.createLinearGradient(0, 0, 0, -l * 1.1);
-  g.addColorStop(0,    hsla(hue, sat + 12, baseLight - 22, alpha));
-  g.addColorStop(0.18, hsla(hue, sat + 8,  baseLight - 12, alpha));
-  g.addColorStop(0.45, hsla(hue, sat + 2,  baseLight + 4,  alpha));
-  g.addColorStop(0.72, hsla(hue, sat - 5,  baseLight + 14, alpha));
-  g.addColorStop(1,    hsla(hue - 4, sat - 14, baseLight + 22, alpha * 0.9));
-  ctx.fillStyle = g;
-  ctx.fill();
-
-  if (highlight) {
-    // Subtle sheen highlight along left side
-    ctx.save();
-    ctx.globalAlpha = 0.13;
-    ctx.beginPath();
-    ctx.moveTo(0, 0);
-    ctx.bezierCurveTo(-w * 0.15, -l * 0.25, -w * 0.12, -l * 0.62, -w * 0.04, -l * 0.88);
-    ctx.bezierCurveTo(w * 0.04, -l * 0.65, w * 0.06, -l * 0.3, 0, 0);
-    ctx.closePath();
-    ctx.fillStyle = "white";
-    ctx.fill();
-    ctx.restore();
-  }
-
-  ctx.restore();
-}
-
-// ── Draw a fully-detailed realistic rose ──
+// ── Draw a concentric-style rose (matching reference image) ──
+// Instead of individual rotating petals, draws concentric filled crescents
+// that create the classic rose ring pattern visible in the reference.
 function drawRealisticRose(
   ctx: CanvasRenderingContext2D,
   x: number, y: number, size: number,
@@ -260,77 +202,139 @@ function drawRealisticRose(
   ctx.translate(x, y);
   ctx.rotate(tilt);
 
-  // Ambient soft glow behind rose
-  if (bloom > 0.25) {
-    const ga = (bloom - 0.25) * 0.22;
-    const gr = ctx.createRadialGradient(0, 0, size * 0.2, 0, 0, size * 2.4);
-    gr.addColorStop(0, hsla(hue, sat - 5, light + 25, ga));
-    gr.addColorStop(1, hsla(hue, sat - 5, light + 20, 0));
-    ctx.fillStyle = gr;
+  const s = size * easeOutCubic(clamp01(bloom * 1.5));
+
+  // ── Solid base circle (dark, visible behind petal gaps) ──
+  if (bloom > 0.05) {
+    const baseGrad = ctx.createRadialGradient(0, 0, 0, 0, 0, s * 0.9);
+    baseGrad.addColorStop(0,   hsla(hue + 4, sat + 10, Math.max(light - 28, 8), 1));
+    baseGrad.addColorStop(0.6, hsla(hue + 2, sat + 5,  Math.max(light - 20, 10), 0.95));
+    baseGrad.addColorStop(1,   hsla(hue, sat, Math.max(light - 12, 14), 0.9));
     ctx.beginPath();
-    ctx.arc(0, 0, size * 2.4, 0, Math.PI * 2);
+    ctx.arc(0, 0, s * 0.88, 0, Math.PI * 2);
+    ctx.fillStyle = baseGrad;
     ctx.fill();
   }
 
-  // === Outer petals (7) — fully open, curl back at edges ===
-  const ob = easeOutCubic(clamp01(bloom * 2.2));
-  if (ob > 0) {
-    for (let i = 0; i < 7; i++) {
-      const angle = (i / 7) * Math.PI * 2 + 0.18;
-      const j = ((i * 2741) % 100) * 0.001 * 0.18 - 0.09; // jitter
-      drawPetalPath(ctx, size * 0.92, size * 0.58, angle + j, hue - 2, sat - 3, light + 12, ob, 0.25, true);
+  // ── Concentric petal rings ──
+  // Each ring: array of crescent arcs at increasing radii
+  // [radius_fraction, arc_start, arc_sweep, width_fraction, lightness_offset, petal_count]
+  const rings: [number, number, number, number, number][] = [
+    // [radius, sweep_angle, thickness, lightness_add, count]
+    [0.85, 1.6,  0.30,  12,  5],  // Outermost — lightest, widest
+    [0.68, 1.4,  0.26,   6,  5],  // Outer-mid
+    [0.52, 1.3,  0.24,   0,  5],  // Mid — base lightness
+    [0.38, 1.2,  0.22,  -8,  4],  // Inner-mid — darker
+    [0.26, 1.1,  0.20, -14,  4],  // Inner — darker still
+    [0.16, 1.0,  0.18, -20,  3],  // Deep inner
+  ];
+
+  const layerOffset = 0.38; // angular offset between layers
+
+  for (let ri = 0; ri < rings.length; ri++) {
+    const [rFrac, sweep, thick, lightAdd, count] = rings[ri];
+    const layerBloom = easeOutCubic(clamp01((bloom - ri * 0.08) * (1.6 + ri * 0.3)));
+    if (layerBloom <= 0) continue;
+
+    const r = s * rFrac;
+    const t = s * thick;
+    const layerLight = light + lightAdd;
+
+    for (let i = 0; i < count; i++) {
+      const baseAngle = (i / count) * Math.PI * 2 + ri * layerOffset;
+      const halfSweep = sweep * 0.5;
+      const startAngle = baseAngle - halfSweep;
+      const endAngle = baseAngle + halfSweep;
+
+      ctx.save();
+      ctx.globalAlpha = layerBloom;
+
+      // ── Draw crescent arc (filled thick arc segment) ──
+      ctx.beginPath();
+      // Outer arc
+      ctx.arc(0, 0, r + t * 0.5, startAngle, endAngle);
+      // Inner arc (reverse)
+      ctx.arc(0, 0, Math.max(r - t * 0.5, 1), endAngle, startAngle, true);
+      ctx.closePath();
+
+      // Gradient: darker at inner edge, lighter at outer edge
+      const gx1 = Math.cos(baseAngle) * (r - t * 0.5);
+      const gy1 = Math.sin(baseAngle) * (r - t * 0.5);
+      const gx2 = Math.cos(baseAngle) * (r + t * 0.5);
+      const gy2 = Math.sin(baseAngle) * (r + t * 0.5);
+      const pg = ctx.createLinearGradient(gx1, gy1, gx2, gy2);
+      pg.addColorStop(0,   hsla(hue + 4, sat + 8,  Math.max(layerLight - 18, 8), 1));
+      pg.addColorStop(0.3, hsla(hue + 2, sat + 3,  Math.max(layerLight - 8, 12), 1));
+      pg.addColorStop(0.6, hsla(hue, sat, layerLight, 1));
+      pg.addColorStop(0.85, hsla(hue - 2, sat - 4, layerLight + 10, 1));
+      pg.addColorStop(1,   hsla(hue - 3, sat - 6, layerLight + 16, 0.95));
+      ctx.fillStyle = pg;
+      ctx.fill();
+
+      // ── Petal edge stroke for definition ──
+      ctx.strokeStyle = hsla(hue + 3, sat + 6, Math.max(layerLight - 16, 6), layerBloom * 0.35);
+      ctx.lineWidth = 0.6;
+      ctx.stroke();
+
+      // ── Highlight arc on the outer edge ──
+      ctx.beginPath();
+      ctx.arc(0, 0, r + t * 0.45, startAngle + 0.15, endAngle - 0.15);
+      ctx.strokeStyle = hsla(hue - 4, sat - 10, layerLight + 20, layerBloom * 0.15);
+      ctx.lineWidth = 0.5;
+      ctx.stroke();
+
+      ctx.restore();
     }
   }
 
-  // === Middle petals (6) — half-open ===
-  const mb = easeOutCubic(clamp01((bloom - 0.10) * 2.6));
-  if (mb > 0) {
-    for (let i = 0; i < 6; i++) {
-      const angle = (i / 6) * Math.PI * 2 + 0.52;
-      drawPetalPath(ctx, size * 0.65, size * 0.42, angle, hue, sat + 3, light + 4, mb, 0.08, true);
-    }
-  }
-
-  // === Inner petals (5) — slightly open ===
-  const ib = easeOutCubic(clamp01((bloom - 0.28) * 2.8));
-  if (ib > 0) {
-    for (let i = 0; i < 5; i++) {
-      const angle = (i / 5) * Math.PI * 2 + 0.25;
-      drawPetalPath(ctx, size * 0.44, size * 0.3, angle, hue, sat + 7, light - 3, ib, -0.05, false);
-    }
-  }
-
-  // === Innermost cupped petals (4) — tightly curled ===
-  const sp = easeOutCubic(clamp01((bloom - 0.48) * 3.2));
-  if (sp > 0) {
-    for (let i = 0; i < 4; i++) {
-      const angle = (i / 4) * Math.PI * 2 + 0.7;
-      drawPetalPath(ctx, size * 0.26, size * 0.18, angle, hue, sat + 12, light - 11, sp, -0.18, false);
-    }
-  }
-
-  // === Tight spiral center bud (3 tiny petals) ===
-  const tp = easeOutCubic(clamp01((bloom - 0.68) * 4));
-  if (tp > 0) {
-    for (let i = 0; i < 3; i++) {
-      const angle = (i / 3) * Math.PI * 2 + 1.1;
-      drawPetalPath(ctx, size * 0.14, size * 0.09, angle, hue, sat + 14, light - 18, tp * 0.9, -0.25, false);
-    }
-  }
-
-  // === Center dot (stamens / pistil) ===
-  const cb = easeOutCubic(clamp01((bloom - 0.82) * 6));
-  if (cb > 0.01) {
-    const r = size * 0.06 * cb;
-    const cg = ctx.createRadialGradient(-r * 0.25, -r * 0.25, 0, 0, 0, r * 1.1);
-    cg.addColorStop(0, hsla(hue, sat + 18, light - 24, 1));
-    cg.addColorStop(0.55, hsla(hue, sat + 14, light - 18, 1));
-    cg.addColorStop(1, hsla(hue, sat + 8, light - 10, 1));
+  // ── Center spiral point ──
+  const hd = easeOutCubic(clamp01((bloom - 0.6) * 3.5));
+  if (hd > 0) {
+    ctx.save();
+    const spiralR = s * 0.12 * hd;
+    const spiralGrad = ctx.createRadialGradient(
+      -spiralR * 0.15, -spiralR * 0.15, 0,
+      0, 0, spiralR * 1.3
+    );
+    spiralGrad.addColorStop(0,   hsla(hue + 6, sat + 12, Math.max(light - 26, 8), 1));
+    spiralGrad.addColorStop(0.5, hsla(hue + 4, sat + 8,  Math.max(light - 20, 10), 0.95));
+    spiralGrad.addColorStop(1,   hsla(hue + 2, sat + 4,  Math.max(light - 12, 14), 0.85));
     ctx.beginPath();
-    ctx.arc(0, 0, r * 1.1, 0, Math.PI * 2);
-    ctx.fillStyle = cg;
-    ctx.shadowBlur = 0;
+    ctx.arc(0, 0, spiralR, 0, Math.PI * 2);
+    ctx.fillStyle = spiralGrad;
     ctx.fill();
+
+    // Spiral whorl line
+    ctx.beginPath();
+    ctx.globalAlpha = 0.25;
+    for (let t = 0; t < Math.PI * 2.5; t += 0.15) {
+      const sr = (t / (Math.PI * 2.5)) * spiralR * 0.8;
+      const sx = Math.cos(t + 0.5) * sr;
+      const sy = Math.sin(t + 0.5) * sr;
+      if (t === 0) ctx.moveTo(sx, sy);
+      else ctx.lineTo(sx, sy);
+    }
+    ctx.strokeStyle = hsla(hue + 6, sat + 8, Math.max(light - 24, 8), 0.5);
+    ctx.lineWidth = 0.5;
+    ctx.lineCap = "round";
+    ctx.stroke();
+    ctx.globalAlpha = 1;
+    ctx.restore();
+  }
+
+  // ── Overall soft highlight (top-right light direction) ──
+  if (bloom > 0.3) {
+    ctx.save();
+    ctx.globalAlpha = 0.08;
+    const hlGrad = ctx.createRadialGradient(s * 0.25, -s * 0.25, 0, 0, 0, s * 0.8);
+    hlGrad.addColorStop(0, "rgba(255,255,255,0.6)");
+    hlGrad.addColorStop(0.5, "rgba(255,255,255,0.15)");
+    hlGrad.addColorStop(1, "rgba(255,255,255,0)");
+    ctx.beginPath();
+    ctx.arc(0, 0, s * 0.8, 0, Math.PI * 2);
+    ctx.fillStyle = hlGrad;
+    ctx.fill();
+    ctx.restore();
   }
 
   ctx.restore();
