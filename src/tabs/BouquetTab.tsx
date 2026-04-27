@@ -37,11 +37,11 @@ interface RoseConfig {
 
 const ROSES: RoseConfig[] = (() => {
   const rows = [
-    { y: -115, count: 2, spread: 28,  sz: 21, delayBase: 1100 },
-    { y: -92,  count: 4, spread: 56,  sz: 24, delayBase: 1200 },
-    { y: -68,  count: 5, spread: 80,  sz: 27, delayBase: 1350 },
-    { y: -44,  count: 5, spread: 88,  sz: 28, delayBase: 1500 },
-    { y: -22,  count: 4, spread: 72,  sz: 25, delayBase: 1650 },
+    { y: -125, count: 4, spread: 45,  sz: 21, delayBase: 1100 },
+    { y: -98,  count: 6, spread: 70,  sz: 24, delayBase: 1200 },
+    { y: -70,  count: 7, spread: 95,  sz: 27, delayBase: 1350 },
+    { y: -40,  count: 7, spread: 100, sz: 28, delayBase: 1500 },
+    { y: -10,  count: 6, spread: 85,  sz: 25, delayBase: 1650 },
   ];
   const out: RoseConfig[] = [];
   let idx = 0;
@@ -129,7 +129,7 @@ const WAX_FLOWERS: FillerFlower[] = (() => {
   seeds.forEach(([dx, dy, sm], i) => {
     const pal = palettes[i % palettes.length];
     out.push({
-      dx, dy,
+      dx: dx * 1.15, dy: dy * 1.15,
       size: (9 + (i % 3) * 2.5) * sm,
       hue: pal.hue, sat: pal.sat, light: pal.light,
       delay: 1900 + i * 55,
@@ -150,7 +150,7 @@ const MINI_DAISIES: FillerFlower[] = (() => {
   ];
   seeds.forEach(([dx, dy], i) => {
     out.push({
-      dx, dy,
+      dx: dx * 1.15, dy: dy * 1.15,
       size: 7 + (i % 3) * 2,
       hue: 50, sat: 90, light: 58,   // center color (yellow)
       delay: 2050 + i * 45,
@@ -181,7 +181,7 @@ const STATICE_CLUSTERS: FillerFlower[] = (() => {
   ];
   seeds.forEach(([dx, dy, size, hue, light], i) => {
     out.push({
-      dx, dy, size,
+      dx: dx * 1.15, dy: dy * 1.15, size,
       hue, sat: 48, light,
       delay: 2100 + i * 40,
       rot: (i * 1.23) % (Math.PI * 2),
@@ -436,33 +436,46 @@ function drawWrapping(
   ctx.translate(cx, topY);
   ctx.scale(sc, sc);
 
-  const topHalf = wrapW * 0.58;
-  const botHalf = wrapW * 0.38;
-  const ribbonY = wrapH * 0.22;
+  const topHalf = wrapW * 0.65;
+  const waistHalf = wrapW * 0.35;
+  const botHalf = wrapW * 0.45;
+  const ribbonY = wrapH * 0.45;
 
-  // The wrapper shape: wide at top, gently tapering with subtle curves
   const drawWrapPath = () => {
     ctx.beginPath();
-    ctx.moveTo(-topHalf, 0);
-    ctx.lineTo(topHalf, 0);
-    // Right side — mostly straight with very subtle inward curve
-    ctx.lineTo(botHalf, wrapH);
-    // Bottom — pointed/narrow base
-    ctx.lineTo(-botHalf, wrapH);
-    // Left side — mirror
-    ctx.lineTo(-topHalf, 0);
+    // Top edge with scalloped waves
+    ctx.moveTo(-topHalf, -20);
+    ctx.quadraticCurveTo(-topHalf * 0.7, -45, -topHalf * 0.35, -15);
+    ctx.quadraticCurveTo(-topHalf * 0.1, 5, 0, 15);
+    ctx.quadraticCurveTo(topHalf * 0.1, 5, topHalf * 0.35, -15);
+    ctx.quadraticCurveTo(topHalf * 0.7, -45, topHalf, -20);
+    
+    // Right side curve
+    ctx.bezierCurveTo(topHalf * 0.8, ribbonY * 0.5, waistHalf, ribbonY * 0.8, waistHalf, ribbonY);
+    ctx.bezierCurveTo(waistHalf, ribbonY * 1.3, botHalf * 0.9, wrapH * 0.8, botHalf, wrapH);
+    
+    // Bottom wavy edge
+    ctx.quadraticCurveTo(botHalf * 0.7, wrapH + 15, botHalf * 0.4, wrapH + 5);
+    ctx.quadraticCurveTo(botHalf * 0.1, wrapH - 5, 0, wrapH + 10);
+    ctx.quadraticCurveTo(-botHalf * 0.1, wrapH - 5, -botHalf * 0.4, wrapH + 5);
+    ctx.quadraticCurveTo(-botHalf * 0.7, wrapH + 15, -botHalf, wrapH);
+    
+    // Left side curve
+    ctx.bezierCurveTo(-botHalf * 0.9, wrapH * 0.8, -waistHalf, ribbonY * 1.3, -waistHalf, ribbonY);
+    ctx.bezierCurveTo(-waistHalf, ribbonY * 0.8, -topHalf * 0.8, ribbonY * 0.5, -topHalf, -20);
+    
     ctx.closePath();
   };
 
   // ── Tissue paper peeking at top ──
   const tissueColors = [
-    "rgba(255,255,255,0.65)",
-    "rgba(255,240,248,0.5)",
-    "rgba(255,220,235,0.45)",
+    "rgba(255,255,255,0.8)",
+    "rgba(250,245,240,0.6)",
+    "rgba(240,235,230,0.5)",
   ];
   for (let layer = 0; layer < 3; layer++) {
-    const tw = topHalf + 14 + layer * 7;
-    const lo = layer * 4;
+    const tw = topHalf + 10 + layer * 5;
+    const lo = layer * 5;
     ctx.save();
     ctx.globalAlpha = 0.6;
     ctx.beginPath();
@@ -470,12 +483,11 @@ function drawWrapping(
     for (let i = 0; i <= 16; i++) {
       const t = i / 16;
       const wx = -tw + t * tw * 2;
-      const wy = -lo - 14 - Math.sin(t * Math.PI * 3.5 + layer * 1.3) * 9 - Math.cos(t * Math.PI * 6 + layer * 0.8) * 4;
+      const wy = -lo - 12 - Math.sin(t * Math.PI * 3.5 + layer * 1.3) * 8 - Math.cos(t * Math.PI * 6 + layer * 0.8) * 3;
       ctx.lineTo(wx, wy);
     }
     ctx.lineTo(tw, -lo);
-    ctx.lineTo(topHalf + 5, 8);
-    ctx.lineTo(-topHalf - 5, 8);
+    ctx.lineTo(0, 10);
     ctx.closePath();
     ctx.fillStyle = tissueColors[layer];
     ctx.fill();
@@ -485,254 +497,210 @@ function drawWrapping(
   // ── Main wrapping paper ──
   drawWrapPath();
 
-  // Rich gradient — warm ivory/pink paper
+  // Neutral beige/brownish gradient for the paper
   const wg = ctx.createLinearGradient(-topHalf, 0, topHalf, 0);
-  wg.addColorStop(0,    "#c9a8b4");
-  wg.addColorStop(0.15, "#dfc0c9");
-  wg.addColorStop(0.38, "#efd4db");
-  wg.addColorStop(0.5,  "#f5dde3");
-  wg.addColorStop(0.62, "#efd4db");
-  wg.addColorStop(0.85, "#dfc0c9");
-  wg.addColorStop(1,    "#c9a8b4");
+  wg.addColorStop(0,    "#c1b5b1");
+  wg.addColorStop(0.2,  "#d1c7c4");
+  wg.addColorStop(0.5,  "#dfd6d3");
+  wg.addColorStop(0.8,  "#d1c7c4");
+  wg.addColorStop(1,    "#c1b5b1");
   ctx.fillStyle = wg;
   ctx.fill();
 
   // Vertical depth gradient
-  const vg = ctx.createLinearGradient(0, 0, 0, wrapH);
-  vg.addColorStop(0,   "rgba(255,255,255,0.18)");
-  vg.addColorStop(0.35,"rgba(255,255,255,0.05)");
-  vg.addColorStop(0.7, "rgba(0,0,0,0.04)");
+  const vg = ctx.createLinearGradient(0, -20, 0, wrapH + 15);
+  vg.addColorStop(0,   "rgba(255,255,255,0.2)");
+  vg.addColorStop(0.4, "rgba(255,255,255,0.05)");
+  vg.addColorStop(0.7, "rgba(0,0,0,0.02)");
   vg.addColorStop(1,   "rgba(0,0,0,0.12)");
   ctx.fillStyle = vg;
   ctx.fill();
 
   // Paper edge stroke
-  ctx.strokeStyle = "rgba(140,70,95,0.14)";
+  ctx.strokeStyle = "rgba(100,80,75,0.2)";
   ctx.lineWidth = 1;
   ctx.stroke();
 
-  // ── Clip and draw texture inside ──
+  // ── Clip and draw pattern inside ──
   ctx.save();
   drawWrapPath();
   ctx.clip();
 
-  // Grid / checkered pattern like reference image
-  ctx.strokeStyle = "rgba(180,130,145,0.10)";
-  ctx.lineWidth = 0.7;
-  const gridSpacing = 12;
-  for (let gy = 0; gy < wrapH; gy += gridSpacing) {
-    const frac = gy / wrapH;
-    const halfAtY = topHalf - (topHalf - botHalf) * frac;
-    // Horizontal lines
+  // Checkered / Grid pattern
+  ctx.strokeStyle = "rgba(120, 100, 95, 0.12)";
+  ctx.lineWidth = 1.5;
+  const gridSpacing = 14;
+  
+  // Horizontal lines
+  for (let y = -30; y <= wrapH + 20; y += gridSpacing) {
     ctx.beginPath();
-    ctx.moveTo(-halfAtY, gy);
-    ctx.lineTo(halfAtY, gy);
+    ctx.moveTo(-wrapW, y);
+    ctx.lineTo(wrapW, y);
     ctx.stroke();
   }
-  // Vertical lines that follow the taper
-  for (let col = -20; col <= 20; col++) {
-    const t = col / 20;
+  
+  // Tapered vertical lines conforming to shape
+  for (let i = -30; i <= 30; i++) {
+    const xTop = i * gridSpacing;
+    const xBot = i * gridSpacing * 0.65;
     ctx.beginPath();
-    ctx.moveTo(t * topHalf, 0);
-    ctx.lineTo(t * botHalf, wrapH);
+    ctx.moveTo(xTop, -30);
+    ctx.quadraticCurveTo(xTop * 0.5, ribbonY, xBot, wrapH + 20);
     ctx.stroke();
   }
 
-  // Subtle dot pattern at intersections
-  ctx.fillStyle = "rgba(180,130,145,0.08)";
-  for (let row = 0; row < Math.floor(wrapH / gridSpacing); row++) {
-    const frac = row / Math.floor(wrapH / gridSpacing);
-    const curHalf = topHalf - (topHalf - botHalf) * frac;
-    const dotY = row * gridSpacing;
-    const cols = Math.floor(curHalf * 2 / gridSpacing);
-    for (let col = 0; col < cols; col++) {
-      const dotX = -curHalf + gridSpacing / 2 + col * gridSpacing;
-      ctx.beginPath();
-      ctx.arc(dotX, dotY, 1.2, 0, Math.PI * 2);
-      ctx.fill();
-    }
-  }
-
-  // Radiating crease lines from center-bottom for realism
-  ctx.strokeStyle = "rgba(160,95,115,0.05)";
-  ctx.lineWidth = 1;
-  for (let i = 0; i < 9; i++) {
-    const angle = -0.55 + (i / 8) * 1.1;
-    ctx.beginPath();
-    ctx.moveTo(0, wrapH * 0.92);
-    ctx.lineTo(Math.sin(angle) * wrapH * 1.1, -wrapH * 0.05);
-    ctx.stroke();
-  }
-  ctx.restore();
-
-  // ── Center fold V-line shadow ──
-  ctx.save();
-  ctx.globalAlpha = 0.07;
+  // Overlapping front flap shadow
+  ctx.globalAlpha = 0.15;
   ctx.beginPath();
-  ctx.moveTo(-3, wrapH * 0.25);
-  ctx.lineTo(0, wrapH);
-  ctx.lineTo(3, wrapH * 0.25);
-  ctx.closePath();
-  ctx.fillStyle = "rgba(0,0,0,1)";
-  ctx.fill();
-  ctx.restore();
-
-  // ── Left flap fold shadow ──
-  ctx.save();
-  ctx.globalAlpha = 0.10;
+  ctx.moveTo(0, 15);
+  ctx.lineTo(0, wrapH + 15);
+  ctx.strokeStyle = "#000";
+  ctx.lineWidth = 2.5;
+  ctx.stroke();
+  
+  // Overlapping front flap highlight
+  ctx.globalAlpha = 0.4;
   ctx.beginPath();
-  ctx.moveTo(-topHalf, 0);
-  ctx.lineTo(-topHalf + 20, 0);
-  ctx.lineTo(-botHalf + 4, wrapH);
-  ctx.lineTo(-botHalf, wrapH);
-  ctx.closePath();
-  ctx.fillStyle = "rgba(0,0,0,1)";
-  ctx.fill();
+  ctx.moveTo(2, 15);
+  ctx.lineTo(2, wrapH + 15);
+  ctx.strokeStyle = "#fff";
+  ctx.lineWidth = 1.5;
+  ctx.stroke();
+
   ctx.restore();
 
-  // ── Right flap fold highlight ──
-  ctx.save();
-  ctx.globalAlpha = 0.06;
-  ctx.beginPath();
-  ctx.moveTo(topHalf, 0);
-  ctx.lineTo(topHalf - 20, 0);
-  ctx.lineTo(botHalf - 4, wrapH);
-  ctx.lineTo(botHalf, wrapH);
-  ctx.closePath();
-  ctx.fillStyle = "rgba(255,255,255,1)";
-  ctx.fill();
-  ctx.restore();
-
-  // ── Ribbon ──
-  const ribbonHalfW = topHalf - (topHalf - botHalf) * (ribbonY / wrapH) + 5;
+  // ── Ribbon & Bows ──
   const rP = clamp01((p - 0.3) * 2.2);
   if (rP > 0) {
     ctx.globalAlpha = rP;
 
-    const bandW = ribbonHalfW + 5;
-    const bandT = 10;
-
-    // Satin ribbon gradient
-    const rg = ctx.createLinearGradient(0, ribbonY - bandT, 0, ribbonY + bandT);
-    rg.addColorStop(0,    "#b02850");
-    rg.addColorStop(0.18, "#d64070");
-    rg.addColorStop(0.42, "#e86080");
-    rg.addColorStop(0.5,  "#f07090");
-    rg.addColorStop(0.58, "#e86080");
-    rg.addColorStop(0.82, "#d04068");
-    rg.addColorStop(1,    "#a02248");
-    ctx.fillStyle = rg;
-
+    // Thin pink string wrapping the bouquet
     ctx.beginPath();
-    ctx.moveTo(-bandW, ribbonY - bandT);
-    ctx.quadraticCurveTo(0, ribbonY - bandT - 3, bandW, ribbonY - bandT);
-    ctx.lineTo(bandW, ribbonY + bandT);
-    ctx.quadraticCurveTo(0, ribbonY + bandT + 3, -bandW, ribbonY + bandT);
-    ctx.closePath();
-    ctx.fill();
-
-    // Ribbon highlight
-    ctx.save();
-    ctx.globalAlpha = 0.22;
-    ctx.beginPath();
-    ctx.moveTo(-bandW, ribbonY - bandT);
-    ctx.quadraticCurveTo(0, ribbonY - bandT - 3, bandW, ribbonY - bandT);
-    ctx.lineTo(bandW, ribbonY - 2);
-    ctx.quadraticCurveTo(0, ribbonY - 4, -bandW, ribbonY - 2);
-    ctx.closePath();
-    ctx.fillStyle = "#fff";
-    ctx.fill();
-    ctx.restore();
-
-    // ── Bow ──
-    const bowCY = ribbonY - bandT - 1;
-
-    // Bow shadow
-    ctx.save();
-    ctx.globalAlpha = 0.1;
-    ctx.beginPath();
-    ctx.ellipse(2, bowCY + 5, 30, 16, 0, 0, Math.PI * 2);
-    ctx.fillStyle = "#000";
-    ctx.fill();
-    ctx.restore();
-
-    // Left bow loop
-    ctx.beginPath();
-    ctx.moveTo(0, bowCY);
-    ctx.bezierCurveTo(-14, bowCY - 20, -38, bowCY - 16, -30, bowCY + 3);
-    ctx.bezierCurveTo(-24, bowCY + 12, -7, bowCY + 5, 0, bowCY);
-    ctx.closePath();
-    const blg = ctx.createRadialGradient(-18, bowCY - 7, 2, -18, bowCY - 4, 22);
-    blg.addColorStop(0, "#f08098");
-    blg.addColorStop(0.5, "#e06080");
-    blg.addColorStop(1, "#b83060");
-    ctx.fillStyle = blg;
-    ctx.fill();
-
-    // Right bow loop
-    ctx.beginPath();
-    ctx.moveTo(0, bowCY);
-    ctx.bezierCurveTo(14, bowCY - 20, 38, bowCY - 16, 30, bowCY + 3);
-    ctx.bezierCurveTo(24, bowCY + 12, 7, bowCY + 5, 0, bowCY);
-    ctx.closePath();
-    const brg = ctx.createRadialGradient(18, bowCY - 7, 2, 18, bowCY - 4, 22);
-    brg.addColorStop(0, "#f08098");
-    brg.addColorStop(0.5, "#e06080");
-    brg.addColorStop(1, "#b83060");
-    ctx.fillStyle = brg;
-    ctx.fill();
-
-    // Bow loop sheen
-    ctx.save();
-    ctx.globalAlpha = 0.22;
-    ctx.beginPath();
-    ctx.ellipse(-20, bowCY - 9, 9, 4.5, -0.32, 0, Math.PI * 2);
-    ctx.fillStyle = "#fff";
-    ctx.fill();
-    ctx.beginPath();
-    ctx.ellipse(20, bowCY - 9, 9, 4.5, 0.32, 0, Math.PI * 2);
-    ctx.fillStyle = "#fff";
-    ctx.fill();
-    ctx.restore();
-
-    // Center knot
-    ctx.beginPath();
-    ctx.ellipse(0, bowCY, 7, 6, 0, 0, Math.PI * 2);
-    const bcg = ctx.createRadialGradient(-1, bowCY - 1, 0, 0, bowCY, 7);
-    bcg.addColorStop(0, "#e86080");
-    bcg.addColorStop(1, "#a82848");
-    ctx.fillStyle = bcg;
-    ctx.fill();
-
-    // Ribbon tails
-    ctx.lineWidth = 4;
-    ctx.lineCap = "round";
-    ctx.strokeStyle = "#cc3860";
-    // Left tail
-    ctx.beginPath();
-    ctx.moveTo(-5, bowCY + 5);
-    ctx.bezierCurveTo(-14, bowCY + 24, -20, bowCY + 38, -10, bowCY + 52);
+    ctx.moveTo(-waistHalf - 2, ribbonY);
+    ctx.quadraticCurveTo(0, ribbonY + 8, waistHalf + 2, ribbonY);
+    ctx.strokeStyle = "#c8677c"; // dark pink string
+    ctx.lineWidth = 3;
     ctx.stroke();
-    // Left tail V-cut
-    ctx.lineWidth = 2.2;
+
+    // Long pink string tails hanging down
     ctx.beginPath();
-    ctx.moveTo(-13, bowCY + 48);
-    ctx.lineTo(-10, bowCY + 52);
-    ctx.lineTo(-7, bowCY + 48);
+    ctx.moveTo(-15, ribbonY + 5);
+    ctx.quadraticCurveTo(-25, ribbonY + 80, -20, wrapH - 20);
     ctx.stroke();
-    // Right tail
-    ctx.lineWidth = 4;
+    
     ctx.beginPath();
-    ctx.moveTo(5, bowCY + 5);
-    ctx.bezierCurveTo(14, bowCY + 24, 20, bowCY + 38, 10, bowCY + 52);
+    ctx.moveTo(15, ribbonY + 5);
+    ctx.quadraticCurveTo(25, ribbonY + 80, 20, wrapH - 20);
     ctx.stroke();
-    // Right tail V-cut
-    ctx.lineWidth = 2.2;
-    ctx.beginPath();
-    ctx.moveTo(7, bowCY + 48);
-    ctx.lineTo(10, bowCY + 52);
-    ctx.lineTo(13, bowCY + 48);
-    ctx.stroke();
+
+    // Double Pink Bows
+    const drawPinkBow = (bx: number, by: number) => {
+      ctx.save();
+      
+      const bowColor = "#d67a8b"; // soft dusty pink
+      const bowHighlight = "#e59eab"; // pink highlight
+      const loopWidth = 38;
+      const loopHeight = 22;
+      const tailLen = 32;
+      const tailX = 16;
+      
+      // Tails (thick pink)
+      ctx.lineWidth = 10;
+      ctx.lineCap = "round";
+      ctx.lineJoin = "round";
+      ctx.strokeStyle = bowColor;
+      
+      // Left tail
+      ctx.beginPath();
+      ctx.moveTo(bx, by);
+      ctx.lineTo(bx - tailX, by + tailLen);
+      ctx.stroke();
+      
+      // Right tail
+      ctx.beginPath();
+      ctx.moveTo(bx, by);
+      ctx.lineTo(bx + tailX, by + tailLen);
+      ctx.stroke();
+
+      // Tails highlight
+      ctx.lineWidth = 5;
+      ctx.strokeStyle = bowHighlight;
+      ctx.beginPath(); ctx.moveTo(bx, by); ctx.lineTo(bx - tailX, by + tailLen); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(bx, by); ctx.lineTo(bx + tailX, by + tailLen); ctx.stroke();
+      
+      // Loops
+      ctx.lineWidth = 10;
+      ctx.strokeStyle = bowColor;
+      
+      // Left loop
+      ctx.beginPath();
+      ctx.moveTo(bx, by);
+      ctx.bezierCurveTo(bx - loopWidth, by - loopHeight, bx - loopWidth - 10, by + loopHeight - 5, bx, by);
+      ctx.stroke();
+      
+      // Right loop
+      ctx.beginPath();
+      ctx.moveTo(bx, by);
+      ctx.bezierCurveTo(bx + loopWidth, by - loopHeight, bx + loopWidth + 10, by + loopHeight - 5, bx, by);
+      ctx.stroke();
+
+      // Loops highlight
+      ctx.lineWidth = 5;
+      ctx.strokeStyle = bowHighlight;
+      ctx.beginPath();
+      ctx.moveTo(bx, by);
+      ctx.bezierCurveTo(bx - loopWidth, by - loopHeight, bx - loopWidth - 10, by + loopHeight - 5, bx, by);
+      ctx.stroke();
+      
+      ctx.beginPath();
+      ctx.moveTo(bx, by);
+      ctx.bezierCurveTo(bx + loopWidth, by - loopHeight, bx + loopWidth + 10, by + loopHeight - 5, bx, by);
+      ctx.stroke();
+
+      // White dotted stitching
+      ctx.lineWidth = 1.2;
+      ctx.strokeStyle = "rgba(255,255,255,0.9)";
+      ctx.setLineDash([3, 4]);
+      
+      // Loops stitching
+      ctx.beginPath();
+      ctx.moveTo(bx, by);
+      ctx.bezierCurveTo(bx - loopWidth, by - loopHeight, bx - loopWidth - 10, by + loopHeight - 5, bx, by);
+      ctx.stroke();
+      
+      ctx.beginPath();
+      ctx.moveTo(bx, by);
+      ctx.bezierCurveTo(bx + loopWidth, by - loopHeight, bx + loopWidth + 10, by + loopHeight - 5, bx, by);
+      ctx.stroke();
+      
+      // Tails stitching
+      ctx.beginPath(); ctx.moveTo(bx, by); ctx.lineTo(bx - tailX, by + tailLen); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(bx, by); ctx.lineTo(bx + tailX, by + tailLen); ctx.stroke();
+      
+      ctx.setLineDash([]);
+      
+      // Center knot
+      ctx.fillStyle = bowColor;
+      ctx.beginPath();
+      ctx.arc(bx, by, 7, 0, Math.PI * 2);
+      ctx.fill();
+      
+      ctx.fillStyle = bowHighlight;
+      ctx.beginPath();
+      ctx.arc(bx, by, 3.5, 0, Math.PI * 2);
+      ctx.fill();
+      
+      ctx.fillStyle = "#fff";
+      ctx.beginPath();
+      ctx.arc(bx, by, 1.2, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.restore();
+    };
+
+    // Draw the two bows
+    drawPinkBow(-22, ribbonY + 2);
+    drawPinkBow(22, ribbonY + 2);
 
     ctx.globalAlpha = 1;
   }
@@ -1137,7 +1105,7 @@ export function BouquetTab() {
       }
 
       // Date card
-      drawCard(context, cx, wrapTopY + wrapH * 0.17, prog(elapsed, 2100, 650));
+      drawCard(context, cx, wrapTopY + wrapH * 0.43, prog(elapsed, 2100, 650));
     };
 
     const animate = (now: number) => {
