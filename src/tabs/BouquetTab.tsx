@@ -1,4 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from "react";
+import Modal from "react-modal";
+import { galleryImages } from "./GalleryTab";
 
 /* ══════════════════════════════════════
    PHOTOREALISTIC BOUQUET — Canvas
@@ -964,6 +966,20 @@ export function BouquetTab() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [showMessage, setShowMessage] = useState(false);
   const [showCanvas, setShowCanvas] = useState(false);
+  const [isCarouselOpen, setIsCarouselOpen] = useState(false);
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+
+  const handleNext = () => setCurrentImageIndex(p => (p + 1) % galleryImages.length);
+  const handlePrev = () => setCurrentImageIndex(p => (p - 1 + galleryImages.length) % galleryImages.length);
+
+  useEffect(() => {
+    if (!isCarouselOpen) return;
+    const timer = setInterval(() => {
+      setCurrentImageIndex((prev) => (prev + 1) % galleryImages.length);
+    }, 4000);
+    return () => clearInterval(timer);
+  }, [isCarouselOpen, currentImageIndex]);
+
   const sparklesRef = useRef<Sparkle[]>([]);
   const petalsRef = useRef<Petal[]>([]);
   const startRef = useRef(0);
@@ -1224,10 +1240,100 @@ export function BouquetTab() {
     <div className="bouquet-scene">
       <canvas ref={canvasRef} className={`bouquet-canvas${showCanvas ? " visible" : ""}`} />
       <div className={`bouquet-message${showMessage ? " visible" : ""}`}>
-        <span className="bq-heart">🌹</span>
+        <span 
+          className="bq-heart" 
+          onClick={() => setIsCarouselOpen(true)}
+          style={{ cursor: "pointer", display: "inline-block", transition: "transform 0.2s" }}
+          onMouseOver={(e) => e.currentTarget.style.transform = "scale(1.2)"}
+          onMouseOut={(e) => e.currentTarget.style.transform = "scale(1)"}
+        >🌹</span>
         <h2>A digital bouquet for you, my Love</h2>
         <p>30 roses for 30 days of officially being together.</p>
       </div>
+
+      <Modal
+        isOpen={isCarouselOpen}
+        onRequestClose={() => setIsCarouselOpen(false)}
+        className="react-modal-content"
+        overlayClassName="react-modal-overlay"
+        contentLabel="Gallery Carousel"
+      >
+        <div className="gallery-modal-content">
+          <button className="gallery-modal-close" onClick={() => setIsCarouselOpen(false)} aria-label="Close modal">
+            &times;
+          </button>
+          
+          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', height: '100%', justifyContent: 'center' }}>
+            <div className="gallery-modal-image-container" style={{ position: 'relative', width: '100%', height: '100%', borderRadius: '16px', overflow: 'hidden' }}>
+              <button onClick={handlePrev} className="carousel-nav-btn prev" aria-label="Previous">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+              </button>
+              
+              {galleryImages.map((img, idx) => (
+                <img 
+                  key={img.id}
+                  src={img.src} 
+                  alt={img.alt} 
+                  style={{ 
+                    position: 'absolute',
+                    top: 0, left: 0,
+                    width: '100%', height: '100%', objectFit: 'contain',
+                    opacity: currentImageIndex === idx ? 1 : 0,
+                    transition: 'opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                    pointerEvents: currentImageIndex === idx ? 'auto' : 'none'
+                  }} 
+                />
+              ))}
+              
+              <button onClick={handleNext} className="carousel-nav-btn next" aria-label="Next">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+              </button>
+
+              <div className="carousel-indicators" style={{ position: 'absolute', bottom: '16px', left: '0', right: '0', display: 'flex', justifyContent: 'center', gap: '6px', zIndex: 10 }}>
+                {galleryImages.map((img, idx) => (
+                  <button
+                    key={img.id}
+                    onClick={() => setCurrentImageIndex(idx)}
+                    aria-label={`Go to image ${idx + 1}`}
+                    style={{
+                      width: currentImageIndex === idx ? '24px' : '8px',
+                      height: '8px',
+                      borderRadius: '4px',
+                      border: 'none',
+                      padding: 0,
+                      cursor: 'pointer',
+                      backgroundColor: currentImageIndex === idx ? '#fff' : 'rgba(255,255,255,0.4)',
+                      transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                      boxShadow: '0 2px 4px rgba(0,0,0,0.2)'
+                    }}
+                  />
+                ))}
+              </div>
+            </div>
+          </div>
+
+          <div className="gallery-modal-spotify" style={{ alignSelf: 'center', gap: '0.6rem' }}>
+            {["0tgVpDi06FyKpA1z0VMD4v", "3U4isOIWM3VvDubwSI3y7a", "6lanRgr6wXibZr8KgzXxBl", "44AyOl4qVkzS48vBsbNXaC", "4u8RkgV6P4TLi89SmlUtv8"].map((trackId, i) => (
+              <iframe 
+                key={trackId}
+                style={{ borderRadius: "12px", background: "transparent" }}
+                src={`https://open.spotify.com/embed/track/${trackId}?utm_source=generator`} 
+                width="100%" 
+                height="80" 
+                frameBorder="0" 
+                allowFullScreen={false}
+                allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" 
+                loading="lazy"
+              ></iframe>
+            ))}
+            <div className="copyright-notice" style={{ marginTop: '0.5rem' }}>
+              <small>
+                *Pick any song to set the mood! Music provided by Spotify.
+              </small>
+            </div>
+          </div>
+        </div>
+      </Modal>
     </div>
   );
 }
