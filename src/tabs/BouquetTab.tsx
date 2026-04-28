@@ -1240,13 +1240,23 @@ export function BouquetTab() {
     <div className="bouquet-scene">
       <canvas ref={canvasRef} className={`bouquet-canvas${showCanvas ? " visible" : ""}`} />
       <div className={`bouquet-message${showMessage ? " visible" : ""}`}>
-        <span 
-          className="bq-heart" 
-          onClick={() => setIsCarouselOpen(true)}
-          style={{ cursor: "pointer", display: "inline-block", transition: "transform 0.2s" }}
-          onMouseOver={(e) => e.currentTarget.style.transform = "scale(1.2)"}
-          onMouseOut={(e) => e.currentTarget.style.transform = "scale(1)"}
-        >🌹</span>
+        <div style={{ position: 'relative', display: 'inline-block', marginBottom: '0.5rem' }}>
+          <span 
+            className="bq-heart" 
+            onClick={() => setIsCarouselOpen(true)}
+            style={{ cursor: "pointer", display: "inline-block", transition: "transform 0.2s", marginBottom: 0 }}
+            onMouseOver={(e) => e.currentTarget.style.transform = "scale(1.2)"}
+            onMouseOut={(e) => e.currentTarget.style.transform = "scale(1)"}
+          >🌹</span>
+          
+          <div className="click-me-hint">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="click-me-arrow">
+              <line x1="19" y1="12" x2="5" y2="12"></line>
+              <polyline points="12 19 5 12 12 5"></polyline>
+            </svg>
+            <span>Please click me!</span>
+          </div>
+        </div>
         <h2>A digital bouquet for you, my Love</h2>
         <p>30 roses for 30 days of officially being together.</p>
       </div>
@@ -1263,52 +1273,47 @@ export function BouquetTab() {
             &times;
           </button>
           
-          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', height: '100%', justifyContent: 'center' }}>
-            <div className="gallery-modal-image-container" style={{ position: 'relative', width: '100%', height: '100%', borderRadius: '16px', overflow: 'hidden' }}>
+          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+            <div className="gallery-modal-image-container" style={{ position: 'relative', width: '100%', flex: 1, minHeight: '250px', borderRadius: '16px', overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
               <button onClick={handlePrev} className="carousel-nav-btn prev" aria-label="Previous">
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
               </button>
               
-              {galleryImages.map((img, idx) => (
-                <img 
-                  key={img.id}
-                  src={img.src} 
-                  alt={img.alt} 
-                  style={{ 
-                    position: 'absolute',
-                    top: 0, left: 0,
-                    width: '100%', height: '100%', objectFit: 'contain',
-                    opacity: currentImageIndex === idx ? 1 : 0,
-                    transition: 'opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-                    pointerEvents: currentImageIndex === idx ? 'auto' : 'none'
-                  }} 
-                />
-              ))}
+              <img 
+                src={galleryImages[currentImageIndex].src} 
+                alt={galleryImages[currentImageIndex].alt} 
+                style={{ 
+                  width: '100%', 
+                  height: 'auto', 
+                  maxHeight: '50vh',
+                  objectFit: 'contain'
+                }} 
+              />
               
               <button onClick={handleNext} className="carousel-nav-btn next" aria-label="Next">
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
               </button>
+            </div>
 
-              <div className="carousel-indicators" style={{ position: 'absolute', bottom: '16px', left: '0', right: '0', display: 'flex', justifyContent: 'center', gap: '6px', zIndex: 10 }}>
-                {galleryImages.map((img, idx) => (
-                  <button
-                    key={img.id}
-                    onClick={() => setCurrentImageIndex(idx)}
-                    aria-label={`Go to image ${idx + 1}`}
-                    style={{
-                      width: currentImageIndex === idx ? '24px' : '8px',
-                      height: '8px',
-                      borderRadius: '4px',
-                      border: 'none',
-                      padding: 0,
-                      cursor: 'pointer',
-                      backgroundColor: currentImageIndex === idx ? '#fff' : 'rgba(255,255,255,0.4)',
-                      transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-                      boxShadow: '0 2px 4px rgba(0,0,0,0.2)'
-                    }}
-                  />
-                ))}
-              </div>
+            <div className="carousel-indicators" style={{ display: 'flex', justifyContent: 'center', gap: '6px', marginTop: '1.2rem', flexWrap: 'wrap', padding: '0 1rem' }}>
+              {galleryImages.map((img, idx) => (
+                <button
+                  key={img.id}
+                  onClick={() => setCurrentImageIndex(idx)}
+                  aria-label={`Go to image ${idx + 1}`}
+                  style={{
+                    width: currentImageIndex === idx ? '24px' : '8px',
+                    height: '8px',
+                    borderRadius: '4px',
+                    border: 'none',
+                    padding: 0,
+                    cursor: 'pointer',
+                    backgroundColor: currentImageIndex === idx ? '#fff' : 'rgba(255,255,255,0.4)',
+                    transition: 'width 0.3s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                    boxShadow: '0 2px 4px rgba(0,0,0,0.2)'
+                  }}
+                />
+              ))}
             </div>
           </div>
 

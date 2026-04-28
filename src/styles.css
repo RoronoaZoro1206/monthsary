@@ -646,6 +646,27 @@ h1 {
   .nav-emoji {
     font-size: 1.2rem;
   }
+
+  .gallery-modal-content {
+    flex-direction: column;
+    padding: 1.5rem;
+    gap: 1.2rem;
+    max-height: 90vh;
+    overflow-y: auto;
+  }
+
+  .gallery-modal-image-container {
+    width: 100%;
+    min-height: 250px;
+  }
+
+  .gallery-modal-image-container img {
+    max-height: 45vh;
+  }
+
+  .gallery-modal-spotify {
+    width: 100%;
+  }
 }
 
 @media (max-width: 640px) {
@@ -660,6 +681,10 @@ h1 {
 
   .bouquet-canvas {
     height: min(380px, 55vh);
+  }
+
+  .react-modal-overlay {
+    padding: 1rem;
   }
 }
 
@@ -676,5 +701,57 @@ h1 {
 
   h1 {
     animation: none !important;
+  }
+}
+
+/* ── Click Me Hint ── */
+.click-me-hint {
+  position: absolute;
+  left: 100%;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  white-space: nowrap;
+  color: var(--rose-600);
+  font-size: 1.6rem;
+  font-family: "Dancing Script", cursive;
+  margin-left: 12px;
+  pointer-events: none;
+}
+
+.click-me-arrow {
+  width: 22px;
+  height: 22px;
+  animation: bounce-horizontal 1.5s infinite;
+}
+
+@keyframes bounce-horizontal {
+  0%, 100% { transform: translateX(0); }
+  50% { transform: translateX(-6px); }
+}
+
+@media (max-width: 640px) {
+  .click-me-hint {
+    font-size: 1.3rem;
+    margin-left: 8px;
+    gap: 0.3rem;
+  }
+  .click-me-arrow {
+    width: 18px;
+    height: 18px;
+  }
+}
+
+@media (max-width: 425px) {
+  .click-me-hint {
+    font-size: 1.15rem;
+    margin-left: 6px;
+    gap: 0.25rem;
+  }
+  .click-me-arrow {
+    width: 16px;
+    height: 16px;
   }
 }
