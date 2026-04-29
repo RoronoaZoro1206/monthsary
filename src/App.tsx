@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { SpeedInsights } from "@vercel/speed-insights/react";
 import { Page } from "./types";
 import { Navigation } from "./components/Navigation";
 import { FloatingHearts } from "./components/FloatingHearts";
@@ -30,6 +31,8 @@ function App() {
       <footer className="page-footer">
         Built with love for Shelly S. Quijano — Happy 1st Monthsary, Love. 💕
       </footer>
+
+      <SpeedInsights />
     </>
   );
 }
