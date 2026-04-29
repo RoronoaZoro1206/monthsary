@@ -469,35 +469,42 @@ h1 {
   box-shadow: inset 0 0 20px rgba(0,0,0,0.05);
 }
 
-/* Top Detail Flap */
-.envelope-flap {
+/* Top Detail Flap Wrapper (Handles rotation without clipping the seal) */
+.envelope-flap-wrapper {
   position: absolute;
   top: 0;
   left: 0;
   width: 100%;
   height: 55%;
-  background: 
-    linear-gradient(180deg, #fbe8ed, #e8b3c1),
-    url("data:image/svg+xml,%3Csvg width='100' height='100' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100' height='100' filter='url(%23noise)' opacity='0.06'/%3E%3C/svg%3E");
-  clip-path: polygon(0 0, 50% 100%, 100% 0);
   transform-origin: top;
   /* Physics-based closing: Flap waits (0.7s) for letter to slide fully down before closing */
   transition: transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) 0.7s, z-index 0s 0.7s;
   z-index: 4;
-  filter: drop-shadow(0 8px 8px rgba(0,0,0,0.1));
+  pointer-events: none;
 }
 
-.envelope-wrapper.open .envelope-flap {
+.envelope-wrapper.open .envelope-flap-wrapper {
   transform: rotateX(180deg);
   z-index: 0;
   /* Physics-based opening: Flap folds up immediately */
   transition: transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) 0s, z-index 0s 0.3s;
 }
 
+/* Visual Flap with triangle cut-out */
+.envelope-flap {
+  position: absolute;
+  inset: 0;
+  background: 
+    linear-gradient(180deg, #fbe8ed, #e8b3c1),
+    url("data:image/svg+xml,%3Csvg width='100' height='100' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100' height='100' filter='url(%23noise)' opacity='0.06'/%3E%3C/svg%3E");
+  clip-path: polygon(0 0, 50% 100%, 100% 0);
+  filter: drop-shadow(0 8px 8px rgba(0,0,0,0.1));
+}
+
 /* Realistic High-Fidelity Wax Seal */
 .wax-seal {
   position: absolute;
-  bottom: -20px;
+  bottom: -25px; /* Offset so it sits exactly at the tip of the flap (bottom of 55% height wrapper) */
   left: 50%;
   transform: translateX(-50%);
   width: 50px;
@@ -564,34 +571,32 @@ h1 {
 /* Detailed Letter Paper */
 .letter-paper {
   position: absolute;
-  bottom: 5%; /* Anchor to bottom when closed */
+  bottom: 5%;
   left: 3%;
   width: 94%;
-  height: 380px; /* Fixed height so it stays neatly inside the envelope */
+  height: 380px;
   background: 
     linear-gradient(to bottom, #fffefb, #fdfaf5),
     url("data:image/svg+xml,%3Csvg width='100' height='100' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100' height='100' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
   border-radius: 4px;
-  box-shadow: 0 0 15px rgba(0,0,0,0.1), inset 0 0 30px rgba(212, 163, 115, 0.1);
+  box-shadow: 0 4px 15px rgba(0,0,0,0.1), inset 0 0 30px rgba(212, 163, 115, 0.15);
   padding: 3rem;
   z-index: 2;
-  /* Physics-based closing: Letter slides in smoothly right away, no height snapping */
-  transition: transform 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) 0s, height 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) 0s, z-index 0s 0.8s;
+  -webkit-font-smoothing: antialiased;
+  /* Letter glides back down; z-index changes instantly so it slides behind the front pocket (z=3) */
+  transition: transform 0.8s cubic-bezier(0.2, 0.8, 0.2, 1), height 0.8s cubic-bezier(0.2, 0.8, 0.2, 1), z-index 0s 0s;
   overflow-y: hidden;
   box-sizing: border-box;
   opacity: 0.95;
 }
 
 .envelope-wrapper.open .letter-paper {
-  /* Glide up smoothly until just below the navbar */
-  transform: translateY(-80%);
-  height: min(120vh, 600px); /* Expanded reading height */
+  transform: translateY(-25%);
+  height: 500px;
   z-index: 5;
   opacity: 1;
   overflow-y: auto;
-  box-shadow: 0 25px 50px rgba(0,0,0,0.15), inset 0 0 30px rgba(212, 163, 115, 0.1);
-  
-  /* Physics-based opening: Delay gliding out until flap folds (0.4s) */
+  box-shadow: 0 25px 50px rgba(0,0,0,0.2), inset 0 0 30px rgba(212, 163, 115, 0.15);
   transition: transform 1s cubic-bezier(0.175, 0.885, 0.32, 1.1) 0.4s, height 1s cubic-bezier(0.175, 0.885, 0.32, 1.1) 0.4s, z-index 0s 0.4s;
 }
 
