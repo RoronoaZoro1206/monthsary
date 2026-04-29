@@ -41,7 +41,12 @@ export function LetterTab() {
           <div className="envelope">
             <div className="envelope-back"></div>
             
-            <div className="letter-paper">
+            <div 
+              className="letter-paper" 
+              onClick={(e) => {
+                if (isOpen) e.stopPropagation();
+              }}
+            >
                <div className="letter-header">
                  {/* <img src="/images/seal-stamp.png" alt="" className="watermark" /> */}
                </div>
@@ -53,7 +58,8 @@ export function LetterTab() {
             
             <div className="envelope-front"></div>
             
-            <div className="envelope-flap">
+            <div className="envelope-flap-wrapper">
+              <div className="envelope-flap"></div>
               <div className="wax-seal"></div>
             </div>
             
