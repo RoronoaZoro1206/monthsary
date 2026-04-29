@@ -58,7 +58,13 @@ export function LetterTab() {
                <div className="letter-signature">Your  Future  Husband</div>
             </div>
             
-            <div className="envelope-front"></div>
+            <div className="envelope-front">
+              <div className="close-hint">
+                <Heart size={14} />
+                <span>Tap here to put back</span>
+                <Heart size={14} />
+              </div>
+            </div>
             
             <div className="envelope-flap-wrapper">
               <div className="envelope-flap"></div>

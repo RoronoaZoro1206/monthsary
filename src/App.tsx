@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Analytics } from "@vercel/analytics/react";
 import { Page } from "./types";
 import { Navigation } from "./components/Navigation";
 import { FloatingHearts } from "./components/FloatingHearts";
@@ -26,6 +27,8 @@ function App() {
         {activePage === "gallery" && <GalleryTab />}
         {activePage === "bouquet" && <BouquetTab />}
       </main>
+
+      <Analytics />
 
       <footer className="page-footer">
         Built with love for Shelly S. Quijano — Happy 1st Monthsary, Love. 💕
