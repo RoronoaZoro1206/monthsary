@@ -398,6 +398,240 @@ h1 {
   filter: saturate(1.1) brightness(1.02);
 }
 
+/* ── Interactive Skeuomorphic Envelope ── */
+.envelope-wrapper {
+  position: relative;
+  width: 100%;
+  max-width: 650px;
+  height: 420px;
+  margin: 4rem auto;
+  perspective: 1400px;
+  cursor: pointer;
+  z-index: 10;
+}
+
+.envelope-wrapper.open {
+  z-index: 20;
+}
+
+.envelope {
+  position: absolute;
+  inset: 0;
+  border-radius: 4px;
+  box-shadow: 0 20px 50px rgba(94, 42, 61, 0.25), 0 10px 20px rgba(94, 42, 61, 0.15);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: visible;
+  transition: transform 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+  transform-style: preserve-3d;
+}
+
+.envelope-wrapper:hover .envelope {
+  transform: translateY(-5px);
+}
+
+.envelope-wrapper.open .envelope {
+  transform: translateY(120px);
+}
+
+/* Textured Envelope Background */
+.envelope-back {
+  position: absolute;
+  inset: 0;
+  background: 
+    linear-gradient(135deg, #f4dce3, #eabdc9),
+    url("data:image/svg+xml,%3Csvg width='100' height='100' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100' height='100' filter='url(%23noise)' opacity='0.08'/%3E%3C/svg%3E");
+  border-radius: 6px;
+  box-shadow: inset 0 0 30px rgba(0,0,0,0.08);
+  z-index: 1;
+}
+
+/* Front Pocket Fold */
+.envelope-front {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
+  filter: drop-shadow(0 -4px 8px rgba(0,0,0,0.05));
+}
+
+.envelope-front::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: 
+    linear-gradient(135deg, #fcedf1, #eabdc9),
+    url("data:image/svg+xml,%3Csvg width='100' height='100' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100' height='100' filter='url(%23noise)' opacity='0.05'/%3E%3C/svg%3E");
+  clip-path: polygon(0 0, 50% 45%, 100% 0, 100% 100%, 0 100%);
+  border-radius: 6px;
+  z-index: 3;
+  box-shadow: inset 0 0 20px rgba(0,0,0,0.05);
+}
+
+/* Top Detail Flap */
+.envelope-flap {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 55%;
+  background: 
+    linear-gradient(180deg, #fbe8ed, #e8b3c1),
+    url("data:image/svg+xml,%3Csvg width='100' height='100' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100' height='100' filter='url(%23noise)' opacity='0.06'/%3E%3C/svg%3E");
+  clip-path: polygon(0 0, 50% 100%, 100% 0);
+  transform-origin: top;
+  /* Physics-based closing: Flap waits (0.7s) for letter to slide fully down before closing */
+  transition: transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) 0.7s, z-index 0s 0.7s;
+  z-index: 4;
+  filter: drop-shadow(0 8px 8px rgba(0,0,0,0.1));
+}
+
+.envelope-wrapper.open .envelope-flap {
+  transform: rotateX(180deg);
+  z-index: 0;
+  /* Physics-based opening: Flap folds up immediately */
+  transition: transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) 0s, z-index 0s 0.3s;
+}
+
+/* Realistic High-Fidelity Wax Seal */
+.wax-seal {
+  position: absolute;
+  bottom: -20px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 50px;
+  height: 50px;
+  background: radial-gradient(circle at 35% 35%, #ff4081 0%, #e91e63 40%, #880e4f 100%);
+  border-radius: 50%;
+  box-shadow: 
+    0 6px 12px rgba(0,0,0,0.35),
+    inset 0 3px 5px rgba(255,255,255,0.6),
+    inset 0 -4px 8px rgba(0,0,0,0.5);
+  z-index: 5;
+  /* Bouncy pop return */
+  transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) 0.7s, opacity 0.3s 0.7s;
+}
+
+.wax-seal::after {
+  content: 'S&L';
+  position: absolute;
+  inset: 5px;
+  border-radius: 50%;
+  border: 2px solid rgba(255,255,255,0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: "Great Vibes", "Dancing Script", cursive;
+  color: #ffdae5;
+  font-size: 1.1rem;
+  box-shadow: inset 0 2px 4px rgba(0,0,0,0.2);
+  text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+}
+
+/* Satisfying 'breaking' pop micro-interaction */
+.envelope-wrapper.open .wax-seal {
+  opacity: 0;
+  transform: translateX(-50%) scale(1.4);
+  transition: transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94) 0s, opacity 0.2s 0.1s;
+}
+
+.envelope-hint {
+  position: absolute;
+  bottom: -40px;
+  left: 50%;
+  transform: translateX(-50%);
+  color: var(--rose-600);
+  font-family: "Cormorant Garamond", serif;
+  font-style: italic;
+  font-size: 1.1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  opacity: 0.8;
+  transition: opacity 0.3s ease;
+}
+
+.envelope-wrapper:hover .envelope-hint {
+  opacity: 1;
+}
+
+.envelope-wrapper.open .envelope-hint {
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* Detailed Letter Paper */
+.letter-paper {
+  position: absolute;
+  bottom: 5%; /* Anchor to bottom when closed */
+  left: 3%;
+  width: 94%;
+  height: 380px; /* Fixed height so it stays neatly inside the envelope */
+  background: 
+    linear-gradient(to bottom, #fffefb, #fdfaf5),
+    url("data:image/svg+xml,%3Csvg width='100' height='100' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100' height='100' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+  border-radius: 4px;
+  box-shadow: 0 0 15px rgba(0,0,0,0.1), inset 0 0 30px rgba(212, 163, 115, 0.1);
+  padding: 3rem;
+  z-index: 2;
+  /* Physics-based closing: Letter slides in smoothly right away, no height snapping */
+  transition: transform 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) 0s, height 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) 0s, z-index 0s 0.8s;
+  overflow-y: hidden;
+  box-sizing: border-box;
+  opacity: 0.95;
+}
+
+.envelope-wrapper.open .letter-paper {
+  /* Glide up smoothly until just below the navbar */
+  transform: translateY(-80%);
+  height: min(120vh, 600px); /* Expanded reading height */
+  z-index: 5;
+  opacity: 1;
+  overflow-y: auto;
+  box-shadow: 0 25px 50px rgba(0,0,0,0.15), inset 0 0 30px rgba(212, 163, 115, 0.1);
+  
+  /* Physics-based opening: Delay gliding out until flap folds (0.4s) */
+  transition: transform 1s cubic-bezier(0.175, 0.885, 0.32, 1.1) 0.4s, height 1s cubic-bezier(0.175, 0.885, 0.32, 1.1) 0.4s, z-index 0s 0.4s;
+}
+
+/* Custom scrollbar for skeuomorphic paper */
+.letter-paper::-webkit-scrollbar {
+  width: 6px;
+}
+.letter-paper::-webkit-scrollbar-track {
+  background: rgba(212, 163, 115, 0.1);
+  border-radius: 3px;
+}
+.letter-paper::-webkit-scrollbar-thumb {
+  background: var(--gold-light);
+  border-radius: 3px;
+}
+
+/* Refined Typography for Paper */
+.letter-content {
+  white-space: pre-line;
+  line-height: 2;
+  color: var(--text-900);
+  font-family: "Cormorant Garamond", serif;
+  font-size: 1.15rem;
+  text-shadow: 0 1px 1px rgba(255,255,255,0.5); /* Letterpress effect */
+}
+
+.letter-content p {
+  margin-top: 0;
+  margin-bottom: 1.5rem;
+}
+
+.letter-signature {
+  font-family: "Great Vibes", "Dancing Script", cursive;
+  font-size: 2.2rem;
+  color: var(--rose-700);
+  margin-top: 3rem;
+  text-align: right;
+  padding-bottom: 2rem;
+}
+
 /* ══════════════════════════════════════
    Digital Bouquet Page (Canvas-based)
    ══════════════════════════════════════ */
