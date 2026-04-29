@@ -616,7 +616,7 @@ h1 {
 /* Refined Typography for Paper */
 .letter-content {
   white-space: pre-line;
-  line-height: 2;
+  line-height: 1.6;
   color: var(--text-900);
   font-family: "Cormorant Garamond", serif;
   font-size: 1.15rem;
